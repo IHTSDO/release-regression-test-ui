@@ -178,11 +178,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         if (validTestRequests.length > 0) {
             this.openWaitingModel('Initiating Regression Tests');
-            
+
             this.triggerTests(validTestRequests, this.buildService, this.regressionTestService).then(() => {
                 this.loadTestReports();
                 this.closeWaitingModel();
-            });            
+            });
         } else {
             this.message = 'No tests to run.';
             this.openErrorModel();
@@ -229,7 +229,7 @@ export class HomeComponent implements OnInit, OnDestroy {
             runTest(validTestRequests, 0);
         });
         return promise;
-        
+
     }
 
     findDiff(fileName) {
