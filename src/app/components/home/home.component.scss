@@ -1,0 +1,14 @@
+@import '~src/variables.scss';
+
+app-modal {    
+    &.success-modal {
+        div.success i {
+            color:$fruit-salad;
+        }
+    }
+    &.error-modal {
+        div.error i {
+            color:$mandy;
+        }
+    }
+}
