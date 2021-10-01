@@ -10,6 +10,10 @@ export class BuildService {
 
   constructor(private http: HttpClient) { }
 
+  getBuild(releaseCenterKey, productKey, buildId): Observable<Build> {
+      return this.http.get<Build>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds/' + buildId);
+  }
+
   getBuilds(releaseCenterKey, productKey, iclucdeBuildConfig, includeQAConfig, visibility): Observable<Build[]> {
         const params = new HttpParams()
             .set('includeBuildConfiguration', iclucdeBuildConfig)

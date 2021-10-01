@@ -20,14 +20,11 @@ import { AuthenticationService } from './services/authentication/authentication.
 import { HomeComponent } from './components/home/home.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { ModalService } from './services/modal/modal.service';
-import { ReleaseCenterService } from './services/releaseCenter/release-center.service';
 import { ReleaseServerService } from './services/releaseServer/release-server.service';
 import { AppRoutingModule } from './app-routing.module';
 import { ProductService } from './services/product/product.service';
-import { ProductDataService } from './services/product/product-data.service';
 import { AuthenticationInterceptor } from './interceptors/authentication.interceptor';
 import { EnvServiceProvider } from './providers/env.service.provider';
-import { PermissionService } from './services/permission/permission.service';
 import { AuthoringService } from './services/authoring/authoring.service';
 
 export function startupServiceFactory(): Function {
@@ -55,12 +52,9 @@ export function startupServiceFactory(): Function {
     providers: [
         AuthenticationService,
         AuthoringService,
-        ReleaseCenterService,
         ReleaseServerService,
         ProductService,
-        ProductDataService,
         ModalService,
-        PermissionService,
         EnvServiceProvider,
         {
             provide: HTTP_INTERCEPTORS,

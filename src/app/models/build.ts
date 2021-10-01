@@ -4,6 +4,7 @@ import { QAConfiguration } from './qaConfiguration';
 
 export class Build {
     id: string;
+    url: string;
     buildUser: string;
     status: string;
     tags: string[];
@@ -11,12 +12,6 @@ export class Build {
     configuration: BuildConfiguration;
     qaTestConfig: QAConfiguration;
     product: Product;
-
-    // UI controls
-    buildDownloadingLog: boolean;
-    buildDownloadingPackage: boolean;
-    buildPublishing: boolean;
-    buildDeleting: boolean;
-    buildCanceling: boolean;
-    buildCreating: boolean;
+    preConditionCheckReports_url: string;
+    postConditionCheckReports_url: string;
 }

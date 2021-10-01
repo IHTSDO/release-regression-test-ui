@@ -1,7 +1,7 @@
 <div class="text-center" [hidden]="viewDetails">
-    <h1 class="pt-3">Regression Test Reports</h1>        
-    <div class="container">        
-        <button class="ml-3 mb-1 btn-blue float-right" data-toggle="tooltip" title="Add New Tests" (click)="clearExistingTestRequests();addNewTestRequest();openModal('add-tests-modal')">Add Tests</button>        
+    <h1 class="pt-3">Regression Test Reports</h1>
+    <div class="container">
+        <button class="ml-3 mb-1 btn-blue float-right" data-toggle="tooltip" title="Add New Tests" (click)="clearExistingTestRequests();addNewTestRequest();openModal('add-tests-modal')">Add Tests</button>
         <button class="ml-3 mb-1 btn-blue float-right" data-toggle="tooltip" title="Reload Test Reports" (click)="loadTestReports();">Refresh</button>
         <table class="table table-bordered" *ngIf="testReportsLoading">
             <tr>
@@ -16,7 +16,7 @@
             </tr>
             <tr>
                 <td colspan="8"><div class="font-weight-bold loading">Loading</div></td>
-            </tr>           
+            </tr>
         </table>
         <table class="table table-bordered" *ngIf="!testReportsLoading">
             <tr>
@@ -39,42 +39,66 @@
                 <td class="pb-0 text-left">{{getProductName(repport?.centerKey,repport?.productKey)}}</td>
                 <td class="pb-0">{{repport?.leftBuildId}}</td>
                 <td class="pb-0">{{repport?.rightBuildId}}</td>
-                <td class="pb-0 font-weight-bold" [ngClass]="{'text-danger': repport?.status === 'FAILED' || repport?.status === 'FAILED_TO_COMPARE', 
-                                                                'text-success': repport?.status === 'PASS', 
+                <td class="pb-0 font-weight-bold" [ngClass]="{'text-danger': repport?.status === 'FAILED' || repport?.status === 'FAILED_TO_COMPARE',
+                                                                'text-success': repport?.status === 'PASS',
                                                                 'text-primary': repport?.status === 'RUNNING'}">
                                                                 {{repport?.status.replaceAll('_', ' ') | titlecase}}
                                                             </td>
-                <td class="pb-0"><a *ngIf="repport?.status !== 'RUNNING'" href="javascript:void(0)" (click)="selectedReport=repport;viewDetails=true">Details</a></td>
+                <td class="pb-0"><a *ngIf="repport?.status !== 'RUNNING'" href="javascript:void(0)" (click)="setSelectedReport(repport);viewDetails=true">Details</a></td>
             </tr>
         </table>
         <pagination-controls id="test_report_table"
-                      (pageChange)="p = $event"                      
+                      (pageChange)="p = $event"
                       directionLinks="true"
                       autoHide="true"
                       responsive="true"
                       previousLabel="Previous"
                       nextLabel="Next"
                       *ngIf="allTestReports.length !== 0">
-        </pagination-controls>        
+        </pagination-controls>
     </div>
 </div>
 
-<div class="text-center" [hidden]="!viewDetails">
+<div class="text-center" [hidden]="!viewDetails" style="height: calc(100vh - 9rem); overflow: auto;">
     <h1 class="pt-3">Test Report Details</h1>
     <div class="container">
         <button class="mb-1 pl-4 pr-4 btn-blue float-left" data-toggle="tooltip" title="Reload Test Reports" (click)="viewDetails=false; selectedReport={}">Back</button>
+        <table class="table table-bordered text-center">
+            <tr>
+                <th>Build ID</th>
+                <th class="w-10">URL</th>
+                <th>Pre-condition Check Report URL</th>
+                <th>Post-condition Check Report URL</th>
+                <th>RVF URL</th>
+            </tr>
+            <tr>
+                <td class="font-weight-bold">{{leftBuild?.id}}</td>
+                <td class="p-0"><a *ngIf="leftBuild?.url" href="{{leftBuild?.url}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+                <td class="p-0"><a *ngIf="leftBuild?.preConditionCheckReports_url" href="{{leftBuild?.preConditionCheckReports_url}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+                <td class="p-0"><a *ngIf="leftBuild?.postConditionCheckReports_url" href="{{leftBuild?.postConditionCheckReports_url}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+                <td class="p-0"><a *ngIf="leftBuild?.rvfURL" href="{{leftBuild?.rvfURL}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+            </tr>
+            <tr>
+                <td class="font-weight-bold">{{rightBuild?.id}}</td>
+                <td class="p-0"><a *ngIf="rightBuild?.url" href="{{rightBuild?.url}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+                <td class="p-0"><a *ngIf="rightBuild?.preConditionCheckReports_url" href="{{rightBuild?.preConditionCheckReports_url}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+                <td class="p-0"><a *ngIf="rightBuild?.postConditionCheckReports_url" href="{{rightBuild?.postConditionCheckReports_url}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+                <td class="p-0"><a *ngIf="rightBuild?.rvfURL" href="{{rightBuild?.rvfURL}}" target="_blank"><i class="material-icons" style="width: 0px; height: 0px; margin-left: -27px;">open_in_new</i></a></td>
+            </tr>
+
+        </table>
         <div>
             <table class="table table-bordered">
                 <tr>
                     <th>Test Name</th>
                     <th>Status</th>
-                    <th *ngIf="selectedReport['status'] !== 'PASS'">Details</th>               
+                    <th *ngIf="selectedReport['status'] !== 'PASS'">Details</th>
                 </tr>
                 <tr *ngFor="let r of selectedReport['reports']">
                     <td class="pb-0 text-left align-middle">{{r?.testName}}</td>
-                    <td class="pb-0 text-left font-weight-bold align-middle" 
-                        [ngClass]="{'text-danger': r?.result === 'FAILED', 
-                                    'text-success': r?.result === 'PASS', 
+                    <td class="pb-0 text-left font-weight-bold align-middle"
+                        [ngClass]="{'text-danger': r?.result === 'FAILED',
+                                    'text-success': r?.result === 'PASS',
                                     'text-warning': r?.result === 'NOT_RUN'}"
                         [attr.colspan]="r?.result === 'PASS' || r?.result === 'NOT_RUN' ? '2' : '1'">
                         {{r?.result.replaceAll('_', ' ') | titlecase}}
@@ -84,11 +108,11 @@
                             <table class="table table-bordered">
                                 <tr>
                                     <th class="text-center">Expected</th>
-                                    <th class="text-center">Actual</th>                                   
+                                    <th class="text-center">Actual</th>
                                 </tr>
                                 <tr>
                                     <td class="pb-0 text-left w-50">{{r?.details?.expected.replaceAll('_', ' ') | titlecase}}</td>
-                                    <td class="pb-0 text-left w-50">{{r?.details?.actual.replaceAll('_', ' ') | titlecase}}</td>   
+                                    <td class="pb-0 text-left w-50">{{r?.details?.actual.replaceAll('_', ' ') | titlecase}}</td>
                                 </tr>
                             </table>
                         </div>
@@ -100,7 +124,7 @@
                                     <th class="text-center">Status</th>
                                     <th class="text-center">Expected</th>
                                     <th class="text-center">Actual</th>
-                                    <th class="text-center" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"></th>                                   
+                                    <th class="text-center" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"></th>
                                 </tr>
                                 <tr *ngFor="let d of r?.details">
                                     <td class="pb-0 text-left" style="width: 10%;">{{d?.name.replaceAll('_', ' ') | titlecase}}</td>
@@ -108,8 +132,8 @@
                                         {{d?.status.replaceAll('_', ' ') | titlecase}}
                                     </td>
                                     <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.expected)}}</td>
-                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td> 
-                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected)">Show Diff</a></td>  
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td>
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected)">Show Diff</a></td>
                                 </tr>
                             </table>
                         </div>
@@ -126,7 +150,7 @@
         <div>
             <div class="row">
                 <div class="d-inline pl-2 pb-0 text-left" style="width: 35%;">
-                    <span class="font-weight-bold">Release Center</span> 
+                    <span class="font-weight-bold">Release Center</span>
                 </div>
                 <div class="d-inline pl-2 pb-0 ml-1 text-left" style="width: 35%;">
                     <span class="font-weight-bold">Product</span>
@@ -149,18 +173,18 @@
                     </select>
                 </div>
                 <div class="d-inline pb-0 ml-1 text-left" style="width: 20%;">
-                    <select class="rounded-lg p-2 m-2 w-100" [(ngModel)]="testRequest.buildId">                         
-                        <option value="" disabled="true">{{isLoadingBuilds(testRequest.centerKey,testRequest.productKey) ? 'Loading...': 'Please Select'}}</option>                        
-                        <option value="{{build?.id}}" *ngFor="let build of buildMap[testRequest.centerKey + '-' + testRequest.productKey]">{{build?.id}}</option>                     
+                    <select class="rounded-lg p-2 m-2 w-100" [(ngModel)]="testRequest.buildId">
+                        <option value="" disabled="true">{{isLoadingBuilds(testRequest.centerKey,testRequest.productKey) ? 'Loading...': 'Please Select'}}</option>
+                        <option value="{{build?.id}}" *ngFor="let build of buildMap[testRequest.centerKey + '-' + testRequest.productKey]">{{build?.id}}</option>
                     </select>
                 </div>
                 <div class="d-inline pb-0 ml-3" style="padding-top: 3px;">
                     <button class="btn-circle btn-blue text-center" (click)="addNewTestRequest(); $event.stopPropagation()" title="Add Test"><i class="material-icons">add</i></button>
-                </div>                
+                </div>
             </div>
         </div>
     </div>
-    <div footer>        
+    <div footer>
         <button type="button" class="btn-sea-buckthorn" (click)="closeModal('add-tests-modal')">Cancel</button>
         <button type="button" class="btn-blue" (click)="runTests(); closeModal('add-tests-modal')">Run</button>
     </div>
@@ -170,29 +194,96 @@
     <h3 header class="mb-0">{{selectedFileName}}</h3>
     <div body class="text-left p-5">
         <div>
-            <div class="row text-center" style="border: 1px solid black;">
-                <div class="col-6" style="border-right: 1px solid black;">
-                    <h4 class="font-weight-bold">{{selectedReport['leftBuildId']}}</h4> 
+            <div class="row">
+                <h2 class="font-weight-bold">Total records added: <span class="text-success">{{insertRows.length}}</span></h2>&nbsp;&nbsp;&nbsp;&nbsp;
+                <h2 class="font-weight-bold">Total records removed: <span class="text-danger">{{deleteRows.length}}</span></h2>&nbsp;&nbsp;&nbsp;&nbsp;
+                <h2 class="font-weight-bold">Total records changed: <span class="text-warning">{{changeRows.length}}</span></h2>
+            </div>
+
+            <br>
+            <div class="row text-center">
+                <h2 class="w-100 font-weight-bold text-success">New records</h2>
+            </div>
+            <div style="border: 1px solid #dee2e6; padding-left: 15px; margin-left: -15px; padding-right: 15px; margin-right: -15px;">
+                <div class="row text-center" style="border-bottom: 1px solid #dee2e6;">
+                    <div class="col-6" style="border-right: 1px solid #dee2e6;">
+                        <h4 class="font-weight-bold">{{selectedReport['leftBuildId']}}</h4>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="font-weight-bold">{{selectedReport['rightBuildId']}}</h4>
+                    </div>
                 </div>
-                <div class="col-6">
-                    <h4 class="font-weight-bold">{{selectedReport['rightBuildId']}}</h4> 
+                <div *ngIf="insertRows.length === 0" class="row text-center">
+                    <span class="w-100">No records</span>
+                </div>
+                <div class="row" *ngFor="let diff of insertRows">
+                    <div class="col-6" style="border-right: 1px solid #dee2e6">
+                    </div>
+                    <div class="col-6">
+                        <span class="text-success">{{diff?.newLine}}</span>
+                    </div>
                 </div>
             </div>
-            <div class="row" *ngFor="let diff of diffReport['diffRows']">
-                <div class="col-6" style="border-right: 1px solid black;border-left: 1px solid black;">
-                    <span [ngClass]="{'text-danger': diff.tag === 'DELETE' || diff.tag === 'CHANGE'}">
-                        <del *ngIf="diff.tag === 'DELETE'">{{diff?.oldLine}}</del>
-                        <span *ngIf="diff.tag !== 'DELETE'">{{diff?.oldLine}}</span>
-                    </span> 
+
+            <br>
+            <div class="row text-center">
+                <h2 class="w-100 font-weight-bold text-danger">Removed records</h2>
+            </div>
+            <div style="border: 1px solid #dee2e6; padding-left: 15px; margin-left: -15px; padding-right: 15px; margin-right: -15px;">
+                <div class="row text-center" style="border-bottom: 1px solid #dee2e6;">
+                    <div class="col-6" style="border-right: 1px solid #dee2e6;">
+                        <h4 class="font-weight-bold">{{selectedReport['leftBuildId']}}</h4>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="font-weight-bold">{{selectedReport['rightBuildId']}}</h4>
+                    </div>
                 </div>
-                <div class="col-6" style="border-right: 1px solid black;">
-                    <span [ngClass]="{'text-success': diff.tag === 'INSERT' || diff.tag === 'CHANGE'}">{{diff?.newLine}}</span>
+                <div *ngIf="deleteRows.length === 0" class="row text-center">
+                    <span class="w-100">No records</span>
                 </div>
-            </div>            
+                <div class="row" *ngFor="let diff of deleteRows">
+                    <div class="col-6" style="border-right: 1px solid #dee2e6;">
+                        <span class="text-danger">
+                            <del>{{diff?.oldLine}}</del>
+                        </span>
+                    </div>
+                    <div class="col-6">
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <div class="row text-center">
+                <h2 class="w-100 font-weight-bold text-warning">Changed records</h2>
+            </div>
+            <div style="border: 1px solid #dee2e6; padding-left: 15px; margin-left: -15px; padding-right: 15px; margin-right: -15px;">
+                <div class="row text-center" style="border-bottom: 1px solid #dee2e6;">
+                    <div class="col-6" style="border-right: 1px solid #dee2e6;">
+                        <h4 class="font-weight-bold">{{selectedReport['leftBuildId']}}</h4>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="font-weight-bold">{{selectedReport['rightBuildId']}}</h4>
+                    </div>
+                </div>
+                <div *ngIf="changeRows.length === 0" class="row text-center">
+                    <span class="w-100">No records</span>
+                </div>
+                <div class="row" *ngFor="let diff of changeRows">
+                    <div class="col-6" style="border-right: 1px solid #dee2e6;">
+                        <span class="text-danger">
+                            <span>{{diff?.oldLine}}</span>
+                        </span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-success">{{diff?.newLine}}</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-    <div footer>        
-        <button type="button" class="btn-sea-buckthorn" (click)="closeModal('diff-report-modal');diffReport = {};">Close</button>
+    <div footer>
+        <button type="button" class="btn-sea-buckthorn" (click)="closeModal('diff-report-modal');diffReport=null;">Close</button>
     </div>
 </app-modal>
 
@@ -201,7 +292,7 @@
     <div body class="text-center p-5">
         <div class="text-left success pl-0"><i class="material-icons">check_circle</i>&nbsp;<div class="d-inline position-absolute pt-2">{{message}}</div></div>
     </div>
-    <div footer>        
+    <div footer>
         <button type="button" class="btn-sea-buckthorn" (click)="closeModal('product-success-modal')">Ok</button>
     </div>
 </app-modal>
@@ -211,7 +302,7 @@
     <div body class="text-center p-5">
         <div class="text-left error pl-0"><i class="material-icons">cancel</i>&nbsp;<div class="d-inline position-absolute pt-2">{{message}}</div></div>
     </div>
-    <div footer>        
+    <div footer>
         <button type="button" class="btn-sea-buckthorn" (click)="closeModal('product-error-modal')">Ok</button>
     </div>
 </app-modal>
@@ -220,5 +311,5 @@
 <app-modal id="waiting-modal" class="modal" hideHeader="true" hideFooter="true" disableBackgroundClickEvent="true" size="small">
     <div body class="text-left p-5 text-center">
         <div class="font-weight-bold loading">{{action}}</div>
-    </div>    
+    </div>
 </app-modal>

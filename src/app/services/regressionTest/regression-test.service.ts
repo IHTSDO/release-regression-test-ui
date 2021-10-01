@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ReleaseCenter } from '../../models/releaseCenter';
 import { CodeSystem } from '../../models/codeSystem';
+import { FileDiffReport } from 'src/app/models/fileDiffReport';
 
 @Injectable({
     providedIn: 'root'
@@ -39,10 +40,10 @@ export class RegressionTestService {
                                       {}, {params: params});
     }
 
-    retrieveDiff(centerKey, productKey, compareId, fileName): Observable<Object> {
+    retrieveDiff(centerKey, productKey, compareId, fileName): Observable<FileDiffReport> {
         const params = new HttpParams()
         .set('fileName', fileName);
-        return this.http.get<Object>('/release/centers/' + centerKey + '/products/' + productKey + '/files/find-diff/' + compareId,
+        return this.http.get<FileDiffReport>('/release/centers/' + centerKey + '/products/' + productKey + '/files/find-diff/' + compareId,
                                       {params: params});
     }
 }

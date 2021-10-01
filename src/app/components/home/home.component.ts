@@ -3,13 +3,13 @@ import { ProductService } from '../../services/product/product.service';
 import { ReleaseCenter } from '../../models/releaseCenter';
 import { ModalService } from '../../services/modal/modal.service';
 import { Product } from '../../models/product';
-import { PermissionService } from '../../services/permission/permission.service';
 import { RegressionTestService } from 'src/app/services/regressionTest/regression-test.service';
 import { TestRequest } from 'src/app/models/testRequest';
 import { ReleaseServerService } from 'src/app/services/releaseServer/release-server.service';
-import { Build } from 'src/app/models/build';
 import { BuildService } from 'src/app/services/build/build.service';
-import { data } from 'jquery';
+import { DiffRow } from 'src/app/models/diffRow';
+import { FileDiffReport } from 'src/app/models/fileDiffReport';
+import { Build } from 'src/app/models/build';
 
 
 @Component({
@@ -19,31 +19,26 @@ import { data } from 'jquery';
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
-    roles: Object;
-
+    interval: any;
     viewDetails = false;
-
     testReportsLoading = false;
 
     allTestReports: Object[]; // hold all test reports
-
-    testRequests: TestRequest[];
-
+    testRequests: TestRequest[]; // hold all test requests
     releaseCenters: ReleaseCenter[];
-
     products: Product[];
-
     buildMap: Object;
-
     buildLoadingMap: Object;
-
-    diffReport: Object;
-
-    interval: any;
-
     selectedReport: Object;
-
     selectedFileName: string;
+    leftBuild: Build;
+    rightBuild: Build;
+
+    // Diff file report
+    diffReport: FileDiffReport;
+    changeRows: DiffRow[];
+    deleteRows: DiffRow[];
+    insertRows: DiffRow[];
 
     // global message
     message: string;
@@ -53,20 +48,23 @@ export class HomeComponent implements OnInit, OnDestroy {
                 private releaseServerService: ReleaseServerService,
                 private productService: ProductService,
                 private buildService: BuildService,
-                private permissionService: PermissionService,
                 private regressionTestService: RegressionTestService) {
     }
 
     ngOnInit(): void {
-        this.roles = this.permissionService.roles;
         this.allTestReports = [];
         this.testRequests = [];
         this.releaseCenters = [];
         this.products = [];
+        this.changeRows = [];
+        this.deleteRows = [];
+        this.insertRows = [];
         this.buildMap = {};
         this.buildLoadingMap = {};
         this.selectedReport = {};
-        this.diffReport = {};
+        this.diffReport = new FileDiffReport();
+        this.leftBuild = new Build();
+        this.rightBuild = new Build();
         this.loadTestReports();
         this.loadAllReleaseCenters();
         this.startPolling();
@@ -160,6 +158,27 @@ export class HomeComponent implements OnInit, OnDestroy {
         );
     }
 
+    setSelectedReport(report: Object) {
+        this.selectedReport = report;
+        const centerKey = this.selectedReport['centerKey'];
+        const productKey = this.selectedReport['productKey'];
+        const leftBuildId = this.selectedReport['leftBuildId'];
+        const rightBuildId = this.selectedReport['rightBuildId'];
+
+        this.leftBuild = new Build();
+        this.rightBuild = new Build();
+        this.buildService.getBuild(centerKey, productKey, leftBuildId).subscribe(
+            reponse => {
+                this.leftBuild = reponse;
+            }
+        );
+        this.buildService.getBuild(centerKey, productKey, rightBuildId).subscribe(
+            reponse => {
+                this.rightBuild = reponse;
+            }
+        );
+    }
+
     isLoadingBuilds(centerKey, productKey) {
         return this.buildLoadingMap[centerKey + '-' + productKey];
     }
@@ -235,6 +254,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     findDiff(fileName) {
         this.openWaitingModel('Generating Diff');
         this.selectedFileName = fileName;
+        this.changeRows = [];
+        this.deleteRows = [];
+        this.insertRows = [];
         this.regressionTestService.findDiff(this.selectedReport['centerKey'],
                                             this.selectedReport['productKey'],
                                             this.selectedReport['leftBuildId'],
@@ -266,6 +288,9 @@ export class HomeComponent implements OnInit, OnDestroy {
                             this.retrieveDiff(fileName, 5000);
                         } else {
                             this.diffReport = response;
+                            this.changeRows = response.diffRows.filter(item => item.tag === 'CHANGE');
+                            this.deleteRows = response.diffRows.filter(item => item.tag === 'DELETE');
+                            this.insertRows = response.diffRows.filter(item => item.tag === 'INSERT');
                             this.closeWaitingModel();
                             this.openModal('diff-report-modal');
                         }
