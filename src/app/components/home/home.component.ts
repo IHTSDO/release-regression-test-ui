@@ -36,7 +36,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     // Diff file report
     diffReport: FileDiffReport;
-    changeRows: DiffRow[];
     deleteRows: DiffRow[];
     insertRows: DiffRow[];
 
@@ -56,7 +55,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.testRequests = [];
         this.releaseCenters = [];
         this.products = [];
-        this.changeRows = [];
         this.deleteRows = [];
         this.insertRows = [];
         this.buildMap = {};
@@ -254,7 +252,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     findDiff(fileName) {
         this.openWaitingModel('Generating Diff');
         this.selectedFileName = fileName;
-        this.changeRows = [];
         this.deleteRows = [];
         this.insertRows = [];
         this.regressionTestService.findDiff(this.selectedReport['centerKey'],
@@ -288,9 +285,8 @@ export class HomeComponent implements OnInit, OnDestroy {
                             this.retrieveDiff(fileName, 5000);
                         } else {
                             this.diffReport = response;
-                            this.changeRows = response.diffRows.filter(item => item.tag === 'CHANGE');
-                            this.deleteRows = response.diffRows.filter(item => item.tag === 'DELETE');
-                            this.insertRows = response.diffRows.filter(item => item.tag === 'INSERT');
+                            this.deleteRows = response.diffRows.filter(item => item.tag === 'DELETE' || item.tag === 'CHANGE');
+                            this.insertRows = response.diffRows.filter(item => item.tag === 'INSERT' || item.tag === 'CHANGE');
                             this.closeWaitingModel();
                             this.openModal('diff-report-modal');
                         }

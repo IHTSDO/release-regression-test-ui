@@ -196,8 +196,7 @@
         <div>
             <div class="row">
                 <h2 class="font-weight-bold">Total records added: <span class="text-success">{{insertRows.length}}</span></h2>&nbsp;&nbsp;&nbsp;&nbsp;
-                <h2 class="font-weight-bold">Total records removed: <span class="text-danger">{{deleteRows.length}}</span></h2>&nbsp;&nbsp;&nbsp;&nbsp;
-                <h2 class="font-weight-bold">Total records changed: <span class="text-warning">{{changeRows.length}}</span></h2>
+                <h2 class="font-weight-bold">Total records removed: <span class="text-danger">{{deleteRows.length}}</span></h2>&nbsp;&nbsp;&nbsp;&nbsp;                
             </div>
 
             <br>
@@ -251,35 +250,6 @@
                     </div>
                 </div>
             </div>
-
-            <br>
-            <div class="row text-center">
-                <h2 class="w-100 font-weight-bold text-warning">Changed records</h2>
-            </div>
-            <div style="border: 1px solid #dee2e6; padding-left: 15px; margin-left: -15px; padding-right: 15px; margin-right: -15px;">
-                <div class="row text-center" style="border-bottom: 1px solid #dee2e6;">
-                    <div class="col-6" style="border-right: 1px solid #dee2e6;">
-                        <h4 class="font-weight-bold">{{selectedReport['leftBuildId']}}</h4>
-                    </div>
-                    <div class="col-6">
-                        <h4 class="font-weight-bold">{{selectedReport['rightBuildId']}}</h4>
-                    </div>
-                </div>
-                <div *ngIf="changeRows.length === 0" class="row text-center">
-                    <span class="w-100">No records</span>
-                </div>
-                <div class="row" *ngFor="let diff of changeRows">
-                    <div class="col-6" style="border-right: 1px solid #dee2e6;">
-                        <span class="text-danger">
-                            <span>{{diff?.oldLine}}</span>
-                        </span>
-                    </div>
-                    <div class="col-6">
-                        <span class="text-success">{{diff?.newLine}}</span>
-                    </div>
-                </div>
-            </div>
-
         </div>
     </div>
     <div footer>
