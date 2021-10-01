@@ -5,5 +5,7 @@ export class FileDiffReport {
     leftBuildId: string;
     rightBuildId: string;
     status: string;
-    diffRows: DiffRow[];
+    deleteRows: DiffRow[];
+    insertRows: DiffRow[];
+    changeRows: DiffRow[];
 }

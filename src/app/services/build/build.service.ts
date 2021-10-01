@@ -10,8 +10,12 @@ export class BuildService {
 
   constructor(private http: HttpClient) { }
 
-  getBuild(releaseCenterKey, productKey, buildId): Observable<Build> {
-      return this.http.get<Build>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds/' + buildId);
+  getBuild(releaseCenterKey, productKey, buildId, iclucdeBuildConfig, includeQAConfig): Observable<Build> {
+      const params = new HttpParams()
+            .set('includeBuildConfiguration', iclucdeBuildConfig)
+            .set('includeQAConfiguration', includeQAConfig);
+      return this.http.get<Build>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds/' + buildId,
+                                {params: params});
   }
 
   getBuilds(releaseCenterKey, productKey, iclucdeBuildConfig, includeQAConfig, visibility): Observable<Build[]> {
