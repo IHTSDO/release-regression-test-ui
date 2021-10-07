@@ -7,6 +7,7 @@
             <tr>
                 <th>ID</th>
                 <th>Date</th>
+                <th>User</th>
                 <th>Release Center</th>
                 <th>Product</th>
                 <th>Original Build ID</th>
@@ -15,13 +16,14 @@
                 <th>Details</th>
             </tr>
             <tr>
-                <td colspan="8"><div class="font-weight-bold loading">Loading</div></td>
+                <td colspan="9"><div class="font-weight-bold loading">Loading</div></td>
             </tr>
         </table>
         <table class="table table-bordered" *ngIf="!testReportsLoading">
             <tr>
                 <th>ID</th>
                 <th>Date</th>
+                <th>User</th>
                 <th>Release Center</th>
                 <th>Product</th>
                 <th>Original Build ID</th>
@@ -30,11 +32,12 @@
                 <th>Details</th>
             </tr>
             <tr *ngIf="allTestReports?.length === 0">
-                <td colspan="8">No reports found.</td>
+                <td colspan="9">No reports found.</td>
             </tr>
             <tr *ngFor="let repport of allTestReports | paginate: {id: 'test_report_table', itemsPerPage: 10, currentPage: p, totalItems: allTestReports.length}">
                 <td class="pb-0 text-left">{{repport?.compareId}}</td>
                 <td class="pb-0 text-left">{{repport?.startDate | date:'yyyy-MM-ddTHH:mm:ss' : 'UTC'}}</td>
+                <td class="pb-0 text-left">{{repport?.username}}</td>
                 <td class="pb-0 text-left">{{getCenterName(repport?.centerKey)}}</td>
                 <td class="pb-0 text-left">{{getProductName(repport?.centerKey,repport?.productKey)}}</td>
                 <td class="pb-0">{{repport?.leftBuildId}}</td>
