@@ -29,6 +29,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     products: Product[];
     buildMap: Object;
     buildLoadingMap: Object;
+    includeHiddenBuildsFlag: Object;
     selectedReport: Object;
     selectedFileName: string;
     leftBuild: Build;
@@ -61,6 +62,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.insertRows = [];
         this.buildMap = {};
         this.buildLoadingMap = {};
+        this.includeHiddenBuildsFlag = {};
         this.selectedReport = {};
         this.diffReport = new FileDiffReport();
         this.leftBuild = new Build();
@@ -144,18 +146,23 @@ export class HomeComponent implements OnInit, OnDestroy {
         return !centerKey ? [] : this.products.filter(item => item.releaseCenter.id === centerKey);
     }
 
-    getBuilds(centerKey, productKey) {
+    getBuilds(centerKey, productKey, index) {
+        const includeHiddenBuilds = this.includeHiddenBuildsFlag[index] ? this.includeHiddenBuildsFlag[index] : false;
         if (!centerKey || !productKey
-            || (this.buildMap && this.buildMap.hasOwnProperty(centerKey + '-' + productKey))) {
+            || (this.buildMap && this.buildMap.hasOwnProperty(centerKey + '-' + productKey + '-' + includeHiddenBuilds))) {
             return;
         }
         this.buildLoadingMap[centerKey + '-' + productKey] = true;
-        this.buildService.getBuilds(centerKey, productKey, false, false, true).subscribe(
+        this.buildService.getBuilds(centerKey, productKey, false, false, includeHiddenBuilds ? null : true).subscribe(
             response => {
-                this.buildMap[centerKey + '-' + productKey] = response;
+                this.buildMap[centerKey + '-' + productKey + '-' + includeHiddenBuilds] = response;
                 this.buildLoadingMap[centerKey + '-' + productKey] = false;
             }
         );
+    }
+
+    getIncludeHiddenBuildFlag(index) {
+        return this.includeHiddenBuildsFlag[index] ? this.includeHiddenBuildsFlag[index] : false;
     }
 
     setSelectedReport(report: Object) {

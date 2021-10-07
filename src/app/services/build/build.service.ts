@@ -19,10 +19,18 @@ export class BuildService {
   }
 
   getBuilds(releaseCenterKey, productKey, iclucdeBuildConfig, includeQAConfig, visibility): Observable<Build[]> {
-        const params = new HttpParams()
+    let params;
+    if (visibility) {
+          params = new HttpParams()
             .set('includeBuildConfiguration', iclucdeBuildConfig)
             .set('includeQAConfiguration', includeQAConfig)
             .set('visibility', visibility);
+        } else {
+          params = new HttpParams()
+            .set('includeBuildConfiguration', iclucdeBuildConfig)
+            .set('includeQAConfiguration', includeQAConfig);
+        }
+
       return this.http.get<Build[]>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds', {params: params});
   }
 
