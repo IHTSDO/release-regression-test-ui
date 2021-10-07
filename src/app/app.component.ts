@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import { AuthoringService } from './services/authoring/authoring.service';
 import { EnvService } from './services/environment/env.service';
 
 @Component({
@@ -9,13 +10,26 @@ import { EnvService } from './services/environment/env.service';
 })
 export class AppComponent implements OnInit {
 
-    constructor(private envService: EnvService,
+    constructor(private authoringService: AuthoringService,
+                private envService: EnvService,
                 private titleService: Title) {
     }
 
     ngOnInit() {
         this.titleService.setTitle('SNOMED CT Release Regression Test UI');
+        this.getUIConfiguration();
         this.assignFavicon();
+    }
+
+    getUIConfiguration() {
+        this.authoringService.getUIConfiguration().subscribe(
+            data => {
+                this.authoringService.uiConfiguration = data;
+            },
+            error => {
+                console.error('ERROR: UI Config failed to load');
+            }
+        );
     }
 
     assignFavicon() {
