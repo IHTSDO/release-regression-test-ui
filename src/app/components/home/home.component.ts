@@ -155,7 +155,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.buildLoadingMap[centerKey + '-' + productKey] = true;
         this.buildService.getBuilds(centerKey, productKey, false, false, includeHiddenBuilds ? null : true).subscribe(
             response => {
-                this.buildMap[centerKey + '-' + productKey + '-' + includeHiddenBuilds] = response;
+                this.buildMap[centerKey + '-' + productKey + '-' + includeHiddenBuilds] = response['content'];
                 this.buildLoadingMap[centerKey + '-' + productKey] = false;
             }
         );
