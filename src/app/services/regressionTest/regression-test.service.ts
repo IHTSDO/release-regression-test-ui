@@ -30,19 +30,21 @@ export class RegressionTestService {
                                         {}, {params: params});
     }
 
-    findDiff(centerKey, productKey, leftBuildId, rightBuildId, fileName, compareId) {
+    findDiff(centerKey, productKey, leftBuildId, rightBuildId, fileName, compareId, ignoreIdComparison) {
         const params = new HttpParams()
         .set('leftBuildId', leftBuildId)
         .set('rightBuildId', rightBuildId)
         .set('fileName', fileName)
-        .set('compareId', compareId);
+        .set('compareId', compareId)
+        .set('ignoreIdComparison', ignoreIdComparison);
         return this.http.post<Object>('/release/centers/' + centerKey + '/products/' + productKey + '/files/find-diff',
                                       {}, {params: params});
     }
 
-    retrieveDiff(centerKey, productKey, compareId, fileName): Observable<FileDiffReport> {
+    retrieveDiff(centerKey, productKey, compareId, fileName, ignoreIdComparison): Observable<FileDiffReport> {
         const params = new HttpParams()
-        .set('fileName', fileName);
+        .set('fileName', fileName)
+        .set('ignoreIdComparison', ignoreIdComparison);
         return this.http.get<FileDiffReport>('/release/centers/' + centerKey + '/products/' + productKey + '/files/find-diff/' + compareId,
                                       {params: params});
     }

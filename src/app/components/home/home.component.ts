@@ -258,7 +258,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     }
 
-    findDiff(fileName) {
+    findDiff(fileName, ignoreIdComparison) {
         this.openWaitingModel('Generating Diff');
         this.selectedFileName = fileName;
         this.changeRows = [];
@@ -269,9 +269,10 @@ export class HomeComponent implements OnInit, OnDestroy {
                                             this.selectedReport['leftBuildId'],
                                             this.selectedReport['rightBuildId'],
                                             fileName,
-                                            this.selectedReport['compareId']).subscribe(
+                                            this.selectedReport['compareId'],
+                                            ignoreIdComparison).subscribe(
             () => {
-                this.retrieveDiff(fileName, 1000);
+                this.retrieveDiff(fileName, ignoreIdComparison, 1000);
             }
         );
     }
@@ -284,15 +285,16 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
     }
 
-    retrieveDiff(fileName, interval) {
+    retrieveDiff(fileName, ignoreIdComparison, interval) {
         setTimeout(() => {
             this.regressionTestService.retrieveDiff(this.selectedReport['centerKey'],
                                                     this.selectedReport['productKey'],
                                                     this.selectedReport['compareId'],
-                                                    fileName).subscribe(
+                                                    fileName,
+                                                    ignoreIdComparison).subscribe(
                     response => {
                         if (response['status'] === 'RUNNING') {
-                            this.retrieveDiff(fileName, 5000);
+                            this.retrieveDiff(fileName, ignoreIdComparison, 5000);
                         } else {
                             this.diffReport = response;
                             this.changeRows = response.changeRows;
