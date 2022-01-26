@@ -281,7 +281,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (typeof obj === 'object' && obj != null) {
             return JSON.stringify(obj);
         } else {
-           return (obj && obj != null) ? obj : '';
+           return obj;
         }
     }
 
@@ -315,6 +315,26 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (!testRequest.centerKey) { missingFields.push('Center ID'); }
 
         return missingFields;
+    }
+
+    getValidationComparisonItems(details) {
+        const json = JSON.parse(details);
+        return json && json['comparisonItems'] ? json['comparisonItems'] : [];
+    }
+
+    getNewAssertions(details) {
+        const json = JSON.parse(details);
+        return json && json['newAssertions'] ? json['newAssertions'] : [];
+    }
+
+    getRemovedAssertions(details) {
+        const json = JSON.parse(details);
+        return json && json['removedAssertions'] ? json['removedAssertions'] : [];
+    }
+
+    getChangedAssertions(details) {
+        const json = JSON.parse(details);
+        return json && json['changedAssertions'] ? json['changedAssertions'] : [];
     }
 
     private startPolling() {

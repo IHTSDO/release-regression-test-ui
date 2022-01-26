@@ -106,7 +106,7 @@
                         [attr.colspan]="r?.result === 'PASS' || r?.result === 'NOT_RUN' ? '2' : '1'">
                         {{r?.result.replaceAll('_', ' ') | titlecase}}
                     </td>
-                    <td class="pb-0 text-left" *ngIf="r?.result !== 'PASS' && r?.result !== 'NOT_RUN'">
+                    <td class="pb-0 text-left" *ngIf="r.testName !=='RVF Report Comparison' && (r?.result !== 'PASS' && r?.result !== 'NOT_RUN') || (r.testName ==='RVF Report Comparison' && isObjectArray(r.details))">
                         <div *ngIf="r?.testShortName === 'BUILD_STATUS_TEST'">
                             <table class="table table-bordered">
                                 <tr>
@@ -139,6 +139,75 @@
                                     <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td>
                                     <td class="pb-0 text-left min-vw-30 w-30 max-vw-30" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected, true)">Show Diff excluding UUID</a></td>
                                     <td class="pb-0 text-left min-vw-30 w-30 max-vw-30" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected, false)">Show Diff including UUID</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                    <td class="pb-0 text-left" *ngIf="r.testName ==='RVF Report Comparison' && r?.result !== 'NOT_RUN' && r.details !== null && !isObjectArray(r.details)">
+                        <div>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th class="text-center">Name</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Expected</th>
+                                    <th class="text-center">Actual</th>
+                                    
+                                </tr>
+                                <tr *ngFor="let d of getValidationComparisonItems(r?.details)">
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d?.testName.replaceAll('_', ' ') | titlecase}}</td>
+                                    <td class="pb-0 text-left font-weight-bold" 
+                                        [ngClass]="{'text-danger': d?.status === 'FAILED', 'text-success': d?.status === 'PASS'}"
+                                        style="width: 10%;">
+                                        {{d?.status.replaceAll('_', ' ') | titlecase}}
+                                    </td>
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.expected)}}</td>
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td>                                    
+                                </tr>
+                            </table>
+                        </div>
+                        <br>
+                        <div>
+                            <h2 class="text-success">New Assertions: {{getNewAssertions(r?.details).length}}</h2>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th class="text-center">UUID</th>
+                                    <th class="text-center">Assertion text</th>
+                                </tr>
+                                <tr *ngFor="let d of getNewAssertions(r?.details)">
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['assertionUuid']}}</td>                                    
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['assertionText']}}</td>                                 
+                                </tr>
+                            </table>
+                        </div>
+                        <br>
+                        <div>
+                            <h2 class="text-danger">Removed Assertions: {{getRemovedAssertions(r?.details).length}}</h2>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th class="text-center">UUID</th>
+                                    <th class="text-center">Assertion text</th>
+                                </tr>
+                                <tr *ngFor="let d of getRemovedAssertions(r?.details)">
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['assertionUuid']}}</td>                                    
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['assertionText']}}</td>                                 
+                                </tr>
+                            </table>
+                        </div>
+                        <br>
+                        <div>
+                            <h2 class="text-warning">Changed Assertions: {{getChangedAssertions(r?.details).length}}</h2>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th class="text-center">UUID</th>
+                                    <th class="text-center">Assertion text</th>
+                                    <th class="text-center">Expected</th>
+                                    <th class="text-center">Actual</th>
+                                </tr>
+                                <tr *ngFor="let d of getChangedAssertions(r?.details)">
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['expected']['assertionUuid']}}</td>                                    
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['expected']['assertionText']}}</td>
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['expected']['failureCount']}}</td>                                    
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['actual']['failureCount']}}</td>                                 
                                 </tr>
                             </table>
                         </div>
