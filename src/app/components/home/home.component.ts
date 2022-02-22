@@ -11,6 +11,10 @@ import { DiffRow } from 'src/app/models/diffRow';
 import { FileDiffReport } from 'src/app/models/fileDiffReport';
 import { Build } from 'src/app/models/build';
 
+enum BuildViewMode {
+    PUBLISHED = 'Published',
+    ALL_RELEASES = 'All Builds'
+}
 
 @Component({
     selector: 'app-home',
@@ -22,6 +26,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     interval: any;
     viewDetails = false;
     testReportsLoading = false;
+    BuildViewMode = BuildViewMode;
 
     allTestReports: Object[]; // hold all test reports
     testRequests: TestRequest[]; // hold all test requests
@@ -29,7 +34,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     products: Product[];
     buildMap: Object;
     buildLoadingMap: Object;
-    includeHiddenBuildsFlag: Object;
     selectedReport: Object;
     selectedFileName: string;
     leftBuild: Build;
@@ -62,7 +66,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.insertRows = [];
         this.buildMap = {};
         this.buildLoadingMap = {};
-        this.includeHiddenBuildsFlag = {};
         this.selectedReport = {};
         this.diffReport = new FileDiffReport();
         this.leftBuild = new Build();
@@ -87,6 +90,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         newTestRequest.buildId = '';
         newTestRequest.productKey = '';
         newTestRequest.centerKey = '';
+        newTestRequest.viewMode = 'PUBLISHED';
+        newTestRequest.includeHiddenBuilds = false;
         this.testRequests.push(newTestRequest);
     }
 
@@ -146,23 +151,22 @@ export class HomeComponent implements OnInit, OnDestroy {
         return !centerKey ? [] : this.products.filter(item => item.releaseCenter.id === centerKey);
     }
 
-    getBuilds(centerKey, productKey, index) {
-        const includeHiddenBuilds = this.includeHiddenBuildsFlag[index] ? this.includeHiddenBuildsFlag[index] : false;
+    getBuilds(request: TestRequest) {
+        const includeHiddenBuilds = request.includeHiddenBuilds;
+        const centerKey = request.centerKey;
+        const productKey = request.productKey;
         if (!centerKey || !productKey
-            || (this.buildMap && this.buildMap.hasOwnProperty(centerKey + '-' + productKey + '-' + includeHiddenBuilds))) {
+            || (this.buildMap
+                && this.buildMap.hasOwnProperty(centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds))) {
             return;
         }
         this.buildLoadingMap[centerKey + '-' + productKey] = true;
-        this.buildService.getBuilds(centerKey, productKey, false, false, includeHiddenBuilds ? null : true).subscribe(
+        this.buildService.getBuilds(centerKey, productKey, false, false, request.viewMode, includeHiddenBuilds ? null : true).subscribe(
             response => {
-                this.buildMap[centerKey + '-' + productKey + '-' + includeHiddenBuilds] = response['content'];
+                this.buildMap[centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds] = response['content'];
                 this.buildLoadingMap[centerKey + '-' + productKey] = false;
             }
         );
-    }
-
-    getIncludeHiddenBuildFlag(index) {
-        return this.includeHiddenBuildsFlag[index] ? this.includeHiddenBuildsFlag[index] : false;
     }
 
     setSelectedReport(report: Object) {

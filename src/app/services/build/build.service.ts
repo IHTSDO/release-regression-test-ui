@@ -18,16 +18,18 @@ export class BuildService {
                                 {params: params});
   }
 
-  getBuilds(releaseCenterKey, productKey, iclucdeBuildConfig, includeQAConfig, visibility): Observable<Build[]> {
+  getBuilds(releaseCenterKey, productKey, iclucdeBuildConfig, includeQAConfig, viewMode, visibility): Observable<Build[]> {
     let params;
     if (visibility) {
           params = new HttpParams()
             .set('includeBuildConfiguration', iclucdeBuildConfig)
             .set('includeQAConfiguration', includeQAConfig)
+            .set('viewMode', viewMode)
             .set('visibility', visibility);
         } else {
           params = new HttpParams()
             .set('includeBuildConfiguration', iclucdeBuildConfig)
+            .set('viewMode', viewMode)
             .set('includeQAConfiguration', includeQAConfig);
         }
 
