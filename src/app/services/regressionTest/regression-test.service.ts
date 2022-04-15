@@ -22,6 +22,10 @@ export class RegressionTestService {
         return this.http.get<Object>('/release/centers/' + centerKey + '/products/' + productKey + '/builds/compare/' + comparedId);
     }
 
+    deleteTestReport(centerKey, productKey, comparedId) {
+        return this.http.delete('/release/centers/' + centerKey + '/products/' + productKey + '/builds/compare/' + comparedId);
+    }
+
     compareBuilds(centerKey, productKey, leftBuildId, rightBuildId) {
           const params = new HttpParams()
           .set('leftBuildId', leftBuildId)

@@ -36,6 +36,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     buildLoadingMap: Object;
     selectedReport: Object;
     selectedFileName: string;
+    selectedReleaseCenter: string;
+    selectedProduct: string;
+    selectedCompareId: string;
     leftBuild: Build;
     rightBuild: Build;
 
@@ -312,6 +315,32 @@ export class HomeComponent implements OnInit, OnDestroy {
         }, interval);
     }
 
+    deleteReport(centerKey, productKey, compareId) {
+        this.message = '';
+        this.regressionTestService.deleteTestReport(centerKey, productKey, compareId).subscribe(
+            () => {
+                this.closeDeleteComfirmationModel();
+                this.message = 'The report ' + compareId + ' has been deleted successfully.';
+                this.openSuccessModel();
+                this.loadTestReports();
+            },
+            errorResponse => {
+                this.message = errorResponse.error.errorMessage;
+                this.closeDeleteComfirmationModel();
+                this.openErrorModel();
+            }
+        );
+    }
+
+    isReportRunningOutOfTime(report) {
+        if (report) {
+            const now = Date.now();
+            const startTime = new Date(report['startDate']).getTime();
+
+            return (now - startTime) > 14400000; // exceed 4 hours
+        }
+        return false;
+    }
     missingFieldsCheck(testRequest: TestRequest): Object[] {
         const missingFields = [];
         if (!testRequest.buildId) { missingFields.push('Build ID'); }
@@ -386,5 +415,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     private openErrorModel() {
         this.openModal('error-modal');
+    }
+
+    private closeDeleteComfirmationModel () {
+        this.closeModal('delete-confirmation-modal');
     }
 }
