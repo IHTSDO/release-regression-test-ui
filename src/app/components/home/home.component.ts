@@ -300,7 +300,8 @@ export class HomeComponent implements OnInit, OnDestroy {
                                                     fileName,
                                                     ignoreIdComparison).subscribe(
                     response => {
-                        if (response['status'] === 'RUNNING') {
+                        if (response['status'] !== 'FAILED' && response['status'] !== 'PASSED'
+                            && response['status'] !== 'FAILED_TO_COMPARE') {
                             this.retrieveDiff(fileName, ignoreIdComparison, 5000);
                         } else {
                             this.diffReport = response;
@@ -341,6 +342,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
         return false;
     }
+
     missingFieldsCheck(testRequest: TestRequest): Object[] {
         const missingFields = [];
         if (!testRequest.buildId) { missingFields.push('Build ID'); }
@@ -373,18 +375,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     private startPolling() {
         this.interval = setInterval(() => {
             this.allTestReports.forEach(report => {
-                if (report['status'] === 'RUNNING') {
+                if (report['status'] !== 'PASSED' && report['status'] !== 'FAILED' && report['status'] !== 'FAILED_TO_COMPARE') {
                     this.regressionTestService.getTestReport(report['centerKey'], report['productKey'], report['compareId']).subscribe(
                         response => {
-                            if (response['status'] !== 'RUNNING') {
-                                for (let i = 0; i < this.allTestReports.length; i++) {
-                                    if (this.allTestReports[i]['compareId'] === response['compareId']) {
-                                        this.allTestReports[i] = response;
-                                        break;
-                                    }
+                            for (let i = 0; i < this.allTestReports.length; i++) {
+                                if (this.allTestReports[i]['compareId'] === response['compareId']) {
+                                    this.allTestReports[i] = response;
+                                    break;
                                 }
-                                this.allTestReports.sort((a, b) => b['startDate'] - a['startDate']);
                             }
+                            this.allTestReports.sort((a, b) => b['startDate'] - a['startDate']);
                         }
                     );
                 }

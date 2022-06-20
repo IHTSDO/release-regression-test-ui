@@ -45,12 +45,12 @@
                 <td class="pb-0">{{report?.leftBuildId}}</td>
                 <td class="pb-0">{{report?.rightBuildId}}</td>
                 <td class="pb-0 font-weight-bold" [ngClass]="{'text-danger': report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE',
-                                                                'text-success': report?.status === 'PASS',
-                                                                'text-primary': report?.status === 'RUNNING'}">
+                                                                'text-success': report?.status === 'PASSED',
+                                                                'text-primary': report?.status !== 'PASSED' && report?.status !== 'FAILED' && report?.status !== 'FAILED_TO_COMPARE'}">
                                                                 {{report?.status.replaceAll('_', ' ') | titlecase}}
                                                             </td>
-                <td class="pb-0"><a *ngIf="report?.status !== 'RUNNING'" href="javascript:void(0)" (click)="setSelectedReport(report);viewDetails=true">Details</a></td>
-                <td class="pb-0"><a *ngIf="report?.status !== 'RUNNING' || isReportRunningOutOfTime(report)" href="javascript:void(0)" (click)="selectedReleaseCenter = report['centerKey'];selectedProduct = report['productKey'];selectedCompareId = report['compareId']; openModal('delete-confirmation-modal')"><i class="material-icons text-mandy" title="Delete report">delete</i></a></td>
+                <td class="pb-0"><a *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED'" href="javascript:void(0)" (click)="setSelectedReport(report);viewDetails=true">Details</a></td>
+                <td class="pb-0"><a *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED' || isReportRunningOutOfTime(report)" href="javascript:void(0)" (click)="selectedReleaseCenter = report['centerKey'];selectedProduct = report['productKey'];selectedCompareId = report['compareId']; openModal('delete-confirmation-modal')"><i class="material-icons text-mandy" title="Delete report">delete</i></a></td>
             </tr>
         </table>
         <pagination-controls id="test_report_table"
