@@ -164,12 +164,22 @@ export class HomeComponent implements OnInit, OnDestroy {
             return;
         }
         this.buildLoadingMap[centerKey + '-' + productKey] = true;
-        this.buildService.getBuilds(centerKey, productKey, false, false, request.viewMode, includeHiddenBuilds ? null : true).subscribe(
-            response => {
-                this.buildMap[centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds] = response['content'];
-                this.buildLoadingMap[centerKey + '-' + productKey] = false;
-            }
-        );
+        if (request.viewMode === 'PUBLISHED') {
+            this.buildService.getPublishedBuilds(centerKey, productKey).subscribe(
+                response => {
+                    this.buildMap[centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds] = response;
+                    this.buildLoadingMap[centerKey + '-' + productKey] = false;
+                }
+            );
+        } else {
+            this.buildService.getBuilds(centerKey, productKey, false, false, request.viewMode, includeHiddenBuilds ? null : true).subscribe(
+                response => {
+                    this.buildMap[centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds] = response['content'];
+                    this.buildLoadingMap[centerKey + '-' + productKey] = false;
+                }
+            );
+        }
+
     }
 
     setSelectedReport(report: Object) {
@@ -184,6 +194,26 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.buildService.getBuild(centerKey, productKey, leftBuildId, false, false).subscribe(
             reponse => {
                 this.leftBuild = reponse;
+            },
+            error => {
+                if (error.status === 404) {
+                    // A fallback to production published releases
+                    this.buildService.getPublishedBuilds(centerKey, productKey).subscribe(
+                        response => {
+                            if (response && response.length !== 0) {
+                                const foundBuilds = response.filter(item => item.id === leftBuildId);
+                                if (foundBuilds.length !== 0) {
+                                    this.leftBuild = foundBuilds[0];
+                                    for (const prop in this.leftBuild) {
+                                        if (prop.endsWith('url')) {
+                                            this.leftBuild[prop] = this.leftBuild[prop].replace('dev-', '').replace('uat-', '');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    );
+                }
             }
         );
         this.buildService.getBuild(centerKey, productKey, rightBuildId, false, false).subscribe(
@@ -228,8 +258,8 @@ export class HomeComponent implements OnInit, OnDestroy {
                 const testRequest = requests[index];
                 buildService.cloneBuild(testRequest['centerKey'], testRequest['productKey'], testRequest['buildId']).subscribe(
                     response => {
-                        const centerKey = response.product.releaseCenter.id;
-                        const productKey = response.product.id;
+                        const centerKey = response.releaseCenterKey;
+                        const productKey = response.productKey;
                         const rightBuildKey = response.id;
                         buildService.updateBuildVisibility(centerKey, productKey, rightBuildKey, false).subscribe(() => {});
                         regressionTestService.compareBuilds(centerKey, productKey, testRequest['buildId'], rightBuildKey).subscribe(

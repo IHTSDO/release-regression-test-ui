@@ -36,6 +36,13 @@ export class BuildService {
       return this.http.get<Build[]>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds', {params: params});
   }
 
+  getPublishedBuilds(releaseCenterKey, productKey): Observable<Build[]> {
+    const params = new HttpParams()
+    .set('includeProdPublishedReleases', 'true');
+    return this.http.get<Build[]>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds/published',
+                                  {params: params});
+  }
+
   cloneBuild(releaseCenterKey, productKey, buildId):  Observable<Build> {
     return this.http.post<Build>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds/' + buildId + '/clone', {});
   }
