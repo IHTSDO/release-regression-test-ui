@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     testReportsLoading = false;
     BuildViewMode = BuildViewMode;
 
-    allTestReports: Object[]; // hold all test reports
+    allTestReports: any[]; // hold all test reports
     testRequests: TestRequest[]; // hold all test requests
     releaseCenters: ReleaseCenter[];
     products: Product[];

@@ -1,67 +1,64 @@
 <div class="text-center" [hidden]="viewDetails">
-    <h1 class="pt-3">Regression Test Reports</h1>
-    <div class="container">
-        <button class="ml-3 mb-1 btn-blue float-right" data-toggle="tooltip" title="Add New Tests" (click)="clearExistingTestRequests();addNewTestRequest();openModal('add-tests-modal')">Add Tests</button>
-        <button class="ml-3 mb-1 btn-blue float-right" data-toggle="tooltip" title="Reload Test Reports" (click)="loadTestReports();">Refresh</button>
+    <h1 class="p-3 pb-0 mb-0">Regression Test Reports</h1>
+    <div class="container-fluid testing-container px-5">
+        <button class="btn green float-end m-2" (click)="clearExistingTestRequests(); addNewTestRequest(); openModal('add-tests-modal')"><i class="fas fa-plus pe-2"></i>ADD TESTS</button>
+        <button class="btn blue float-end m-2" (click)="loadTestReports()"><i class="fa-solid fa-arrow-rotate-right pe-2"></i>REFRESH</button>
         <table class="table table-bordered" *ngIf="testReportsLoading">
+            <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>User</th>
-                <th>Release Center</th>
-                <th>Product</th>
-                <th>Original Build ID</th>
-                <th>New Build ID</th>
-                <th>Status</th>
-                <th>Details</th>
+                <th><h3 class="mb-0 text-start">ID</h3></th>
+                <th><h3 class="mb-0 text-start">Date</h3></th>
+                <th><h3 class="mb-0 text-start">User</h3></th>
+                <th><h3 class="mb-0 text-start">Release Center</h3></th>
+                <th><h3 class="mb-0 text-start">Product</h3></th>
+                <th><h3 class="mb-0">Original Build ID</h3></th>
+                <th><h3 class="mb-0">New Build ID</h3></th>
+                <th><h3 class="mb-0">Status</h3></th>
+                <th><h3 class="mb-0">Details</h3></th>
                 <th></th>
             </tr>
+            </thead>
+            <tbody>
             <tr>
                 <td colspan="10"><div class="font-weight-bold loading">Loading</div></td>
             </tr>
+            </tbody>
         </table>
-        <table class="table table-bordered" *ngIf="!testReportsLoading">
+        <table class="table table-bordered table-striped" *ngIf="!testReportsLoading">
+            <thead>
             <tr>
-                <th>ID</th>
-                <th>Date</th>
-                <th>User</th>
-                <th>Release Center</th>
-                <th>Product</th>
-                <th>Original Build ID</th>
-                <th>New Build ID</th>
-                <th>Status</th>
-                <th>Details</th>
+                <th><h3 class="mb-0 text-start">ID</h3></th>
+                <th><h3 class="mb-0 text-start">Date</h3></th>
+                <th><h3 class="mb-0 text-start">User</h3></th>
+                <th><h3 class="mb-0 text-start">Release Center</h3></th>
+                <th><h3 class="mb-0 text-start">Product</h3></th>
+                <th><h3 class="mb-0">Original Build ID</h3></th>
+                <th><h3 class="mb-0">New Build ID</h3></th>
+                <th><h3 class="mb-0">Status</h3></th>
+                <th><h3 class="mb-0">Details</h3></th>
                 <th></th>
             </tr>
+            </thead>
+            <tbody>
             <tr *ngIf="allTestReports?.length === 0">
                 <td colspan="10">No reports found.</td>
             </tr>
-            <tr *ngFor="let report of allTestReports | paginate: {id: 'test_report_table', itemsPerPage: 10, currentPage: p, totalItems: allTestReports.length}">
-                <td class="pb-0 text-left">{{report?.compareId}}</td>
-                <td class="pb-0 text-left">{{report?.startDate | date:'yyyy-MM-ddTHH:mm:ss' : 'UTC'}}</td>
-                <td class="pb-0 text-left">{{report?.username}}</td>
-                <td class="pb-0 text-left">{{getCenterName(report?.centerKey)}}</td>
-                <td class="pb-0 text-left">{{getProductName(report?.centerKey,report?.productKey)}}</td>
-                <td class="pb-0">{{report?.leftBuildId}}</td>
-                <td class="pb-0">{{report?.rightBuildId}}</td>
-                <td class="pb-0 font-weight-bold" [ngClass]="{'text-danger': report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE',
-                                                                'text-success': report?.status === 'PASSED',
-                                                                'text-primary': report?.status !== 'PASSED' && report?.status !== 'FAILED' && report?.status !== 'FAILED_TO_COMPARE'}">
-                                                                {{report?.status.replaceAll('_', ' ') | titlecase}}
-                                                            </td>
-                <td class="pb-0"><a *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED'" href="javascript:void(0)" (click)="setSelectedReport(report);viewDetails=true">Details</a></td>
-                <td class="pb-0"><a *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED' || isReportRunningOutOfTime(report)" href="javascript:void(0)" (click)="selectedReleaseCenter = report['centerKey'];selectedProduct = report['productKey'];selectedCompareId = report['compareId']; openModal('delete-confirmation-modal')"><i class="material-icons text-mandy" title="Delete report">delete</i></a></td>
+            <tr *ngFor="let report of allTestReports">
+                <td class="p-3 text-start">{{report?.compareId}}</td>
+                <td class="p-3 text-start">{{report?.startDate | date:'yyyy-MM-ddTHH:mm:ss' : 'UTC'}}</td>
+                <td class="p-3 text-start">{{report?.username}}</td>
+                <td class="p-3 text-start">{{getCenterName(report?.centerKey)}}</td>
+                <td class="p-3 text-start">{{getProductName(report?.centerKey,report?.productKey)}}</td>
+                <td class="p-3">{{report?.leftBuildId}}</td>
+                <td class="p-3">{{report?.rightBuildId}}</td>
+                <td class="p-3 font-weight-bold" [ngClass]="{'text-danger': report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE', 'text-success': report?.status === 'PASSED', 'text-primary': report?.status !== 'PASSED' && report?.status !== 'FAILED' && report?.status !== 'FAILED_TO_COMPARE'}">
+                    <b>{{report?.status.replaceAll('_', ' ') | titlecase}}</b>
+                </td>
+                <td class="p-3"><button *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED'" class="blue p-2 px-3" (click)="setSelectedReport(report); viewDetails = true"><i class="fa-solid fa-list pe-2"></i>DETAILS</button></td>
+                <td class="p-3"><button *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED' || isReportRunningOutOfTime(report)" (click)="selectedReleaseCenter = report['centerKey'];selectedProduct = report['productKey'];selectedCompareId = report['compareId']; openModal('delete-confirmation-modal')" class="red p-2 px-3"><i class="fas fa-times pe-2"></i>DELETE</button>
             </tr>
+            </tbody>
         </table>
-        <pagination-controls id="test_report_table"
-                      (pageChange)="p = $event"
-                      directionLinks="true"
-                      autoHide="true"
-                      responsive="true"
-                      previousLabel="Previous"
-                      nextLabel="Next"
-                      *ngIf="allTestReports.length !== 0">
-        </pagination-controls>
     </div>
 </div>
 
@@ -154,17 +151,17 @@
                                     <th class="text-center">Status</th>
                                     <th class="text-center">Expected</th>
                                     <th class="text-center">Actual</th>
-                                    
+
                                 </tr>
                                 <tr *ngFor="let d of getValidationComparisonItems(r?.details)">
                                     <td class="pb-0 text-left" style="width: 10%;">{{d?.testName.replaceAll('_', ' ') | titlecase}}</td>
-                                    <td class="pb-0 text-left font-weight-bold" 
+                                    <td class="pb-0 text-left font-weight-bold"
                                         [ngClass]="{'text-danger': d?.status === 'FAILED', 'text-success': d?.status === 'PASS'}"
                                         style="width: 10%;">
                                         {{d?.status.replaceAll('_', ' ') | titlecase}}
                                     </td>
                                     <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.expected)}}</td>
-                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td>                                    
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td>
                                 </tr>
                             </table>
                         </div>
@@ -177,8 +174,8 @@
                                     <th class="text-center">Assertion text</th>
                                 </tr>
                                 <tr *ngFor="let d of getNewAssertions(r?.details)">
-                                    <td class="pb-0 text-left" style="width: 10%;">{{d['assertionUuid']}}</td>                                    
-                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['assertionText']}}</td>                                 
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['assertionUuid']}}</td>
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['assertionText']}}</td>
                                 </tr>
                             </table>
                         </div>
@@ -191,8 +188,8 @@
                                     <th class="text-center">Assertion text</th>
                                 </tr>
                                 <tr *ngFor="let d of getRemovedAssertions(r?.details)">
-                                    <td class="pb-0 text-left" style="width: 10%;">{{d['assertionUuid']}}</td>                                    
-                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['assertionText']}}</td>                                 
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['assertionUuid']}}</td>
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['assertionText']}}</td>
                                 </tr>
                             </table>
                         </div>
@@ -207,10 +204,10 @@
                                     <th class="text-center">Actual</th>
                                 </tr>
                                 <tr *ngFor="let d of getChangedAssertions(r?.details)">
-                                    <td class="pb-0 text-left" style="width: 10%;">{{d['expected']['assertionUuid']}}</td>                                    
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['expected']['assertionUuid']}}</td>
                                     <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['expected']['assertionText']}}</td>
-                                    <td class="pb-0 text-left" style="width: 10%;">{{d['expected']['failureCount']}}</td>                                    
-                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['actual']['failureCount']}}</td>                                 
+                                    <td class="pb-0 text-left" style="width: 10%;">{{d['expected']['failureCount']}}</td>
+                                    <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{d['actual']['failureCount']}}</td>
                                 </tr>
                             </table>
                         </div>
@@ -223,59 +220,74 @@
 
 <app-modal id="add-tests-modal" class="modal" size="x-large">
     <h3 header class="mb-0">Add Tests</h3>
-    <div body class="text-left p-5">
+    <div body class="text-left p-3">
         <div>
             <div class="row">
-                <div class="d-inline pl-2 pb-0 text-left" style="width: 27%;">
-                    <span class="font-weight-bold">Release Center</span>
+                <div class="col">
+                    <h3 class="m-2 ps-3">Release Center</h3>
                 </div>
-                <div class="d-inline pl-2 pb-0 ml-1 text-left" style="width: 27%;">
-                    <span class="font-weight-bold">Product</span>
+                <div class="col">
+                    <h3 class="m-2 ps-3">Product</h3>
                 </div>
-                <div class="d-inline pl-2 pb-0 ml-1 text-left" style="width: 15%;">
-                    <span class="font-weight-bold">Build</span>
+                <div class="col">
+                    <h3 class="m-2 ps-3">Build</h3>
                 </div>
-                <div class="d-inline pl-2 pb-0 ml-1 text-left" style="width: 10%;">
-                    <span class="font-weight-bold">View</span>
+                <div class="col">
+                    <h3 class="m-2 ps-3">View</h3>
+                </div>
+                <div class="col">
+                    <h3 class="m-2 ps-3">Hidden Builds</h3>
                 </div>
             </div>
-            <div class="row" *ngFor="let testRequest of testRequests; let i = index">
-                <div class="d-inline pb-0 text-left" style="width: 27%;">
-                    <select class="rounded-lg p-2 m-2 w-100" [(ngModel)]="testRequest.centerKey" (change)='testRequest.productKey="";testRequest.buildId=""'>
-                        <option value="" disabled="true">Please Select</option>
-                        <option value="{{center?.id}}" *ngFor="let center of releaseCenters">{{center?.name}}</option>
-                    </select>
+            <ng-container *ngFor="let testRequest of testRequests; let i = index">
+                <div class="row mb-4">
+                    <div class="col">
+                        <select class="form-select" [(ngModel)]="testRequest.centerKey" (change)='testRequest.productKey="";testRequest.buildId=""'>
+                            <option value="" disabled="true">Please Select</option>
+                            <option value="{{center?.id}}" *ngFor="let center of releaseCenters">{{center?.name}}</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select class="form-select" [(ngModel)]="testRequest.productKey" (change)="getBuilds(testRequest)">
+                            <option value="" disabled="true">Please Select</option>
+                            <option value="{{product?.id}}" *ngFor="let product of getProductsByCenter(testRequest.centerKey)">{{product?.name}}</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select class="form-select" [(ngModel)]="testRequest.buildId">
+                            <option value="" disabled="true">{{isLoadingBuilds(testRequest.centerKey,testRequest.productKey) ? 'Loading...': 'Please Select'}}</option>
+                            <option value="{{build?.id}}" *ngFor="let build of buildMap[testRequest.centerKey + '-' + testRequest.productKey + '-' + testRequest.viewMode + '-' + testRequest.includeHiddenBuilds]">{{build?.id}}</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select class="form-select" [(ngModel)]="testRequest.viewMode" (change)="testRequest.buildId=''; getBuilds(testRequest)">
+                            <option value="{{enum.key}}" *ngFor="let enum of BuildViewMode | keyvalue">{{enum.value}}</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <div class="form-check form-switch mx-3 my-1">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" [(ngModel)]="testRequest.includeHiddenBuilds" (click)="testRequest.buildId=''; testRequest.includeHiddenBuilds=!testRequest.includeHiddenBuilds; getBuilds(testRequest);">
+                            <label *ngIf="testRequest.includeHiddenBuilds" class="form-check-label my-1" for="flexSwitchCheckDefault">Included</label>
+                            <label *ngIf="!testRequest.includeHiddenBuilds" class="form-check-label my-1" for="flexSwitchCheckDefault">Excluded</label>
+                        </div>
+                    </div>
+
+<!--                    <div class="col">-->
+<!--                        <input type="checkbox" [(ngModel)]="testRequest.includeHiddenBuilds" (click)="testRequest.buildId=''; testRequest.includeHiddenBuilds=!testRequest.includeHiddenBuilds; getBuilds(testRequest);">-->
+<!--                        <span class="pl-2 font-weight-bold">Include Hidden Builds</span>-->
+<!--                    </div>-->
                 </div>
-                <div class="d-inline pb-0 ml-1 text-left" style="width: 27%;">
-                    <select class="rounded-lg p-2 m-2 w-100" [(ngModel)]="testRequest.productKey" (change)="getBuilds(testRequest)">
-                        <option value="" disabled="true">Please Select</option>
-                        <option value="{{product?.id}}" *ngFor="let product of getProductsByCenter(testRequest.centerKey)">{{product?.name}}</option>
-                    </select>
+                <div class="row">
+                    <div class="pb-0" *ngIf="i === (testRequests.length -1)">
+                        <button class="blue float-end" (click)="addNewTestRequest(); $event.stopPropagation()"><i class="fas fa-plus pe-2"></i>ADD TESTS</button>
+                    </div>
                 </div>
-                <div class="d-inline pb-0 ml-1 text-left" style="width: 15%;">
-                    <select class="rounded-lg p-2 m-2 w-100" [(ngModel)]="testRequest.buildId">
-                        <option value="" disabled="true">{{isLoadingBuilds(testRequest.centerKey,testRequest.productKey) ? 'Loading...': 'Please Select'}}</option>
-                        <option value="{{build?.id}}" *ngFor="let build of buildMap[testRequest.centerKey + '-' + testRequest.productKey + '-' + testRequest.viewMode + '-' + testRequest.includeHiddenBuilds]">{{build?.id}}</option>
-                    </select>
-                </div>
-                <div class="d-inline pb-0 ml-1 text-left" style="width: 10%;">
-                    <select class="rounded-lg p-2 m-2 w-100" [(ngModel)]="testRequest.viewMode" (change)="testRequest.buildId=''; getBuilds(testRequest)">                        
-                        <option value="{{enum.key}}" *ngFor="let enum of BuildViewMode | keyvalue">{{enum.value}}</option>
-                    </select>
-                </div>
-                <div class="d-inline pt-3 ml-3 align-middle">
-                    <input type="checkbox" [(ngModel)]="testRequest.includeHiddenBuilds" (click)="testRequest.buildId=''; testRequest.includeHiddenBuilds=!testRequest.includeHiddenBuilds; getBuilds(testRequest);">
-                    <span class="pl-2 font-weight-bold">Include Hidden Builds</span>
-                </div>
-                <div class="d-inline pb-0 ml-3" style="padding-top: 3px;" *ngIf="i === (testRequests.length -1)">
-                    <button class="btn-circle btn-blue text-center" (click)="addNewTestRequest(); $event.stopPropagation()" title="Add Test"><i class="material-icons">add</i></button>
-                </div>                
-            </div>
+            </ng-container>
         </div>
     </div>
     <div footer>
-        <button type="button" class="btn-sea-buckthorn" (click)="closeModal('add-tests-modal')">Cancel</button>
-        <button type="button" class="btn-blue" (click)="runTests(); closeModal('add-tests-modal')">Run</button>
+        <button type="button" class="btn" (click)="closeModal('add-tests-modal')">CANCEL</button>
+        <button type="button" class="btn blue ms-3" (click)="runTests(); closeModal('add-tests-modal')">RUN</button>
     </div>
 </app-modal>
 
@@ -410,7 +422,7 @@
 </app-modal>
 
 <!--Waiting Model-->
-<app-modal id="waiting-modal" class="modal" hideHeader="true" hideFooter="true" disableBackgroundClickEvent="true" size="small">
+<app-modal id="waiting-modal" class="modal" [hideHeader]="true" [hideFooter]="true" [disableBackgroundClickEvent]="true" size="small">
     <div body class="text-left p-5 text-center">
         <div class="font-weight-bold loading">{{action}}</div>
     </div>
