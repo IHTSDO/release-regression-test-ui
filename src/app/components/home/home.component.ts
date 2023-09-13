@@ -10,6 +10,7 @@ import { BuildService } from 'src/app/services/build/build.service';
 import { DiffRow } from 'src/app/models/diffRow';
 import { FileDiffReport } from 'src/app/models/fileDiffReport';
 import { Build } from 'src/app/models/build';
+import { MatPaginator } from '@angular/material/paginator';
 
 enum BuildViewMode {
     PUBLISHED = 'Published',
@@ -23,12 +24,15 @@ enum BuildViewMode {
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
+    @ViewChild('reportPaginator') reportPaginator: MatPaginator;
+
     interval: any;
     viewDetails = false;
     testReportsLoading = false;
     BuildViewMode = BuildViewMode;
 
     allTestReports: any[]; // hold all test reports
+    filteredTestReports: any[]; // hold filtered test reports
     testRequests: TestRequest[]; // hold all test requests
     releaseCenters: ReleaseCenter[];
     products: Product[];
@@ -52,6 +56,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     message: string;
     action: string;
 
+    // pagination
+    totalReport = 0;
+    pageSize = 10;
+
     constructor(private modalService: ModalService,
                 private releaseServerService: ReleaseServerService,
                 private productService: ProductService,
@@ -61,6 +69,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.allTestReports = [];
+        this.filteredTestReports = [];
         this.testRequests = [];
         this.releaseCenters = [];
         this.products = [];
@@ -100,10 +109,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     loadTestReports() {
         this.testReportsLoading = true;
+        this.totalReport = 0;
         this.regressionTestService.getTestReports().subscribe(
             response => {
                 this.allTestReports = response;
+                this.totalReport = this.allTestReports.length;
                 this.allTestReports.sort((a, b) => b['startDate'] - a['startDate']);
+                this.filterTestReports();
             },
             errorResponse => {
                 this.message = errorResponse.error.errorMessage;
@@ -331,7 +343,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                                                     ignoreIdComparison).subscribe(
                     response => {
                         if (response['status'] !== 'FAILED' && response['status'] !== 'PASSED'
-                            && response['status'] !== 'FAILED_TO_COMPARE') {
+                            && response['status'] !== 'FAILED_TO_COMPARE' && response['status'] !== 'COMPLETED') {
                             this.retrieveDiff(fileName, ignoreIdComparison, 5000);
                         } else {
                             this.diffReport = response;
@@ -353,6 +365,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                 this.closeDeleteComfirmationModel();
                 this.message = 'The report ' + compareId + ' has been deleted successfully.';
                 this.openSuccessModel();
+                this.reportPaginator.firstPage();
                 this.loadTestReports();
             },
             errorResponse => {
@@ -402,19 +415,56 @@ export class HomeComponent implements OnInit, OnDestroy {
         return json && json['changedAssertions'] ? json['changedAssertions'] : [];
     }
 
+    openURL(url) {
+        window.open(url, '_blank');
+    }
+
+    refreshPaginatedTestReports() {
+        if (this.reportPaginator) {
+            this.reportPaginator.firstPage();
+        }
+    }
+
+    handlePageChange(event) {
+        if (event.pageSize !== this.pageSize) {
+            this.pageSize = event.pageSize;
+            this.reportPaginator.firstPage();
+        }
+        this.filterTestReports();
+    }
+
+    filterTestReports() {
+        let pageIndex = 0;
+        if (this.reportPaginator) {
+            pageIndex = this.reportPaginator.pageIndex;
+        }
+        this.filteredTestReports = this.filterTestReportsByPage(this.allTestReports, this.pageSize, pageIndex);
+    }
+
+    filterTestReportsByPage(testReports: any[], pageSize: number, pageIndex: number): any[] {
+        const startIndex = pageIndex * pageSize;
+        const endIndex = startIndex + pageSize;
+        return testReports.slice(startIndex, endIndex);
+    }
+
     private startPolling() {
         this.interval = setInterval(() => {
-            this.allTestReports.forEach(report => {
+            this.filteredTestReports.forEach(report => {
                 if (report['status'] !== 'PASSED' && report['status'] !== 'FAILED' && report['status'] !== 'FAILED_TO_COMPARE') {
                     this.regressionTestService.getTestReport(report['centerKey'], report['productKey'], report['compareId']).subscribe(
                         response => {
+                            for (let i = 0; i < this.filteredTestReports.length; i++) {
+                                if (this.filteredTestReports[i]['compareId'] === response['compareId']) {
+                                    this.filteredTestReports[i] = response;
+                                    break;
+                                }
+                            }
                             for (let i = 0; i < this.allTestReports.length; i++) {
                                 if (this.allTestReports[i]['compareId'] === response['compareId']) {
                                     this.allTestReports[i] = response;
                                     break;
                                 }
                             }
-                            this.allTestReports.sort((a, b) => b['startDate'] - a['startDate']);
                         }
                     );
                 }

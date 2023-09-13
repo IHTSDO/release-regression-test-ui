@@ -26,7 +26,8 @@ import { ProductService } from './services/product/product.service';
 import { AuthenticationInterceptor } from './interceptors/authentication.interceptor';
 import { EnvServiceProvider } from './providers/env.service.provider';
 import { AuthoringService } from './services/authoring/authoring.service';
-import {ToastrModule} from 'ngx-toastr';
+import { ToastrModule } from 'ngx-toastr';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 export function startupServiceFactory(): Function {
     return () => {};
@@ -44,10 +45,11 @@ export function startupServiceFactory(): Function {
         BrowserModule,
         FormsModule,
         HttpClientModule,
-        // BrowserAnimationsModule,
+        BrowserAnimationsModule,
         NgbTypeaheadModule,
         AppRoutingModule,
-        ToastrModule.forRoot()
+        ToastrModule.forRoot(),
+        MatPaginatorModule
         // BsDatepickerModule.forRoot()
     ],
     providers: [

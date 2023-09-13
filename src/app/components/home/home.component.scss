@@ -1,6 +1,6 @@
 @import 'src/variables.scss';
 
-div.testing-container {
+div {
     button {
         color: $white;
 
@@ -47,8 +47,66 @@ table {
             }
         }
     }
-}
+    td {
+        padding: 1.1rem .8rem .8rem .8rem;
+    }
+    thead {
+        tr:first-child {
+            background-color: #E0E0E0;
+        }
+        td {
+            font-weight: 400;
+            background-color: transparent !important;
+            &.asc, &.desc, &.sortable {
+                padding-right: 25px;
+            }
+            &.asc::after, &.desc::after {
+                right: 10px;
+            }
+        }
+    }
+    tbody {
+        tr {
+            cursor: pointer;
+            &:hover {
+                background-color: lighten($anakiwa, 5%);
+            }
+        }
+        td {
+            background-color: transparent !important;
+        }
+        tr.active {
+            background-color: lighten($anakiwa, 5%);
 
+            &:hover {
+                background-color: $anakiwa;
+            }
+        }
+    }
+}
+.report-details {
+    table {
+        thead {
+            td {
+                background-color: inherit !important;
+            }
+        }
+        tbody {
+            tr {
+                cursor: default;
+                &:hover {
+                    background-color: inherit;
+                }
+            }
+            thead {
+                tr:hover {
+                    background-color: #E0E0E0;
+                }
+            }
+            
+        }       
+    }    
+}
 app-modal {
     &#add-tests-modal {
         button {

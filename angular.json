@@ -34,9 +34,10 @@
                             "src/assets"
                         ],
                         "styles": [
-                            "./node_modules/bootstrap/dist/css/bootstrap.min.css",
-                            "./node_modules/@fortawesome/fontawesome-free/css/all.css",
-                            "src/styles.scss"
+                          "@angular/material/prebuilt-themes/indigo-pink.css",
+                          "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+                          "./node_modules/@fortawesome/fontawesome-free/css/all.css",
+                          "src/styles.scss"
                         ],
                         "scripts": [
                             "./node_modules/jquery/dist/jquery.min.js",
