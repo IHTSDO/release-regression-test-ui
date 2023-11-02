@@ -1,6 +1,25 @@
-@import '~src/variables.scss';
+@import 'src/variables.scss';
 
-nav {    
+nav {
+    color: $white;
+    background-color: $bootstrap-dark;
+
+    &.local {
+        border-bottom: 4px solid $slate-grey;
+    }
+
+    &.dev {
+        border-bottom: 4px solid $mandy;
+    }
+
+    &.uat {
+        border-bottom: 4px solid $fruit-salad;
+    }
+
+    &.prod {
+        border-bottom: 4px solid $cerulean;
+    }
+
     a.logo {
         height: 4rem;
         font-size: 1.6rem;

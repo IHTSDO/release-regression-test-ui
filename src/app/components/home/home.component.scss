@@ -1,6 +1,135 @@
-@import '~src/variables.scss';
+@import 'src/variables.scss';
 
-app-modal {    
+div {
+    button {
+        color: $white;
+
+        &.green {
+            background-color: lighten($fruit-salad, 10%);
+
+            i {
+                color: lighten($fruit-salad, 30%);
+            }
+            &:hover {
+                background-color: $fruit-salad;
+            }
+        }
+        &.blue {
+            background-color: lighten($cerulean, 10%);
+            i {
+                color: lighten($cerulean, 30%);
+            }
+            &:hover {
+                background-color: $cerulean;
+            }
+        }
+        &.red {
+            background-color: lighten($mandy, 10%);
+            i {
+                color: lighten($mandy, 30%);
+            }
+            &:hover {
+                background-color: $mandy;
+            }
+        }
+    }
+}
+
+table {
+    button {
+        &.blue {
+            background-color: lighten($cerulean, 10%);
+            i {
+                color: lighten($cerulean, 30%);
+            }
+            &:hover {
+                background-color: $cerulean;
+            }
+        }
+    }
+    td {
+        padding: 1.1rem .8rem .8rem .8rem;
+    }
+    thead {
+        tr:first-child {
+            background-color: #E0E0E0;
+        }
+        td {
+            font-weight: 400;
+            background-color: transparent !important;
+            &.asc, &.desc, &.sortable {
+                padding-right: 25px;
+            }
+            &.asc::after, &.desc::after {
+                right: 10px;
+            }
+        }
+    }
+    tbody {
+        tr {
+            cursor: pointer;
+            &:hover {
+                background-color: lighten($anakiwa, 5%);
+            }
+        }
+        td {
+            background-color: transparent !important;
+        }
+        tr.active {
+            background-color: lighten($anakiwa, 5%);
+
+            &:hover {
+                background-color: $anakiwa;
+            }
+        }
+    }
+}
+.report-details {
+    table {
+        thead {
+            td {
+                background-color: inherit !important;
+            }
+        }
+        tbody {
+            tr {
+                cursor: default;
+                &:hover {
+                    background-color: inherit;
+                }
+            }
+            thead {
+                tr:hover {
+                    background-color: #E0E0E0;
+                }
+            }
+            
+        }       
+    }    
+}
+app-modal {
+    &#add-tests-modal {
+        button {
+            &.blue {
+                background-color: lighten($cerulean, 10%);
+                i {
+                    color: lighten($cerulean, 30%);
+                }
+                &:hover {
+                    background-color: $cerulean;
+                }
+            }
+        }
+
+        select, label {
+            font-size: 1.4rem;
+        }
+
+        input {
+            font-size: 1.6rem;
+        }
+    }
+
     &.success-modal {
         div.success i {
             color:$fruit-salad;
