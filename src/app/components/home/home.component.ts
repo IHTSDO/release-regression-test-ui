@@ -141,6 +141,13 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.releaseServerService.getCenters().subscribe(
             response => {
                 this.releaseCenters = response;
+                this.releaseCenters.sort((a, b) => {
+                    if (b['id'] === 'international') {
+                        return 1;
+                    } else {
+                        return a['name'].localeCompare(b['name']);
+                    }
+                });
                 for (let i = 0; i < this.releaseCenters.length; i++) {
                     this.loadProductsForCenter(this.releaseCenters[i].id);
                 }
@@ -179,6 +186,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         if (request.viewMode === 'PUBLISHED') {
             this.buildService.getPublishedBuilds(centerKey, productKey).subscribe(
                 response => {
+                    response.sort((a, b) => new Date(b['id']).getTime() - new Date(a['id']).getTime());
                     this.buildMap[centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds] = response;
                     this.buildLoadingMap[centerKey + '-' + productKey] = false;
                 }
@@ -186,6 +194,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         } else {
             this.buildService.getBuilds(centerKey, productKey, false, false, request.viewMode, includeHiddenBuilds ? null : true).subscribe(
                 response => {
+                    response.sort((a, b) => new Date(b['id']).getTime() - new Date(a['id']).getTime());
                     this.buildMap[centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds] = response['content'];
                     this.buildLoadingMap[centerKey + '-' + productKey] = false;
                 }

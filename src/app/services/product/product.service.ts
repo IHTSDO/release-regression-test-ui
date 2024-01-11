@@ -14,7 +14,9 @@ export class ProductService {
     getProducts(releaseCenterKey, pageNumber, pageSize): Observable<Product> {
         const params = new HttpParams()
                     .set('pageNumber', (pageNumber - 1).toString())
-                    .set('pageSize', pageSize);
+                    .set('pageSize', pageSize)
+                    .set('sortField', 'name')
+                    .set('sortDirection', 'asc');
         return this.http.get<Product>('/release/centers/' + releaseCenterKey + '/products', {params: params});
     }
 }
