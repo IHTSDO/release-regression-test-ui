@@ -1,4 +1,4 @@
-<div class="text-center" [hidden]="viewDetails">
+<div class="text-center">
     <h1 class="p-3 pb-0 mb-0">Regression Test Reports</h1>
     <div class="container-fluid testing-container px-5">
         <button class="btn green float-end m-2" (click)="clearExistingTestRequests(); addNewTestRequest(); openModal('add-tests-modal')"><i class="fas fa-plus pe-2"></i>ADD TESTS</button>
@@ -32,7 +32,7 @@
                 <td><h3 class="mb-0 text-start">User</h3></td>
                 <td><h3 class="mb-0 text-start">Release Center</h3></td>
                 <td><h3 class="mb-0 text-start">Product</h3></td>
-                <td><h3 class="mb-0" style="min-width: 85px;">Original Build ID</h3></td>
+                <td><h3 class="mb-0" style="min-width: 120px;">Original Build ID</h3></td>
                 <td><h3 class="mb-0">New Build ID</h3></td>
                 <td><h3 class="mb-0 th-sm">Status</h3></td>
                 <td><h3 class="mb-0 th-sm">Details</h3></td>
@@ -54,7 +54,7 @@
                 <td class="p-3 fw-bold" [ngClass]="{'text-danger': report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE', 'text-success': report?.status === 'PASSED', 'text-primary': report?.status !== 'PASSED' && report?.status !== 'FAILED' && report?.status !== 'FAILED_TO_COMPARE'}">
                     <b>{{report?.status.replaceAll('_', ' ') | titlecase}}</b>
                 </td>
-                <td class="p-3"><button *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED'" class="blue p-2 px-3 text-nowrap" (click)="setSelectedReport(report); viewDetails = true"><i class="fa-solid fa-list pe-2"></i>DETAILS</button></td>
+                <td class="p-3"><button *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED'" class="blue p-2 px-3 text-nowrap" (click)="setSelectedReport(report); openModal('report-details-modal')"><i class="fa-solid fa-list pe-2"></i>DETAILS</button></td>
                 <td class="p-3"><button *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED' || isReportRunningOutOfTime(report)" (click)="selectedReleaseCenter = report['centerKey'];selectedProduct = report['productKey'];selectedCompareId = report['compareId']; openModal('delete-confirmation-modal')" class="red p-2 px-3 text-nowrap"><i class="fas fa-times pe-2"></i>DELETE</button>
             </tr>
             </tbody>
@@ -70,110 +70,96 @@
     </div>
 </div>
 
-<div class="text-center" [hidden]="!viewDetails" style="height: calc(100vh - 9rem); overflow: auto;">
-    <h1 class="pt-3">Test Report Details</h1>
-    <div class="container-fluid testing-container px-5 report-details">
-        <button class="float-start btn blue m-2" data-toggle="tooltip" title="Reload Test Reports" (click)="viewDetails=false; selectedReport={}"><i class="fas fa-chevron-left pe-3"></i>BACK</button>
-        <table class="table table-bordered text-center">
-            <thead>
-                <tr>
-                    <td>Build ID</td>
-                    <td class="w-10">URL</td>
-                    <td>Pre-condition Check Report URL</td>
-                    <td>Post-condition Check Report URL</td>
-                    <td>RVF URL</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td class="fw-bold">{{leftBuild?.id}}</td>
-                    <td><button type="button" *ngIf="leftBuild?.url" class="btn blue text-nowrap" (click)="openURL(leftBuild?.url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                    <td><button type="button" *ngIf="leftBuild?.preConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(leftBuild?.preConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                    <td><button type="button" *ngIf="leftBuild?.postConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(leftBuild?.postConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                    <td><button type="button" *ngIf="leftBuild?.rvfURL" class="btn blue text-nowrap" (click)="openURL(leftBuild?.rvfURL); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                </tr>
-                <tr>
-                    <td class="fw-bold">{{rightBuild?.id}}</td>
-                    <td><button type="button" *ngIf="rightBuild?.url" class="btn blue text-nowrap" (click)="openURL(rightBuild?.url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                    <td><button type="button" *ngIf="rightBuild?.preConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(rightBuild?.preConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                    <td><button type="button" *ngIf="rightBuild?.postConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(rightBuild?.postConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                    <td><button type="button" *ngIf="rightBuild?.rvfURL" class="btn blue text-nowrap" (click)="openURL(rightBuild?.rvfURL); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
-                </tr>
-            </tbody>
-        </table>
-        <div>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <td>Test Name</td>
-                        <td>Status</td>
-                        <td *ngIf="selectedReport['status'] !== 'PASS'">Details</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let r of selectedReport['reports']">
-                        <td class="pb-0 text-left align-middle" style="width: 17%">{{r?.testName}}</td>
-                        <td class="pb-0 text-left fw-bold align-middle"
-                            [ngClass]="{'text-danger': r?.result === 'FAILED',
-                                        'text-success': r?.result === 'PASS',
-                                        'text-warning': r?.result === 'NOT_RUN'}"
-                            [attr.colspan]="r?.result === 'PASS' || r?.result === 'NOT_RUN' ? '2' : '1'">
-                            {{r?.result.replaceAll('_', ' ') | titlecase}}
-                        </td>
-                        <td class="pb-0 text-left" *ngIf="r.testName !=='RVF Report Comparison' && (r?.result !== 'PASS' && r?.result !== 'NOT_RUN') || (r.testName ==='RVF Report Comparison' && isObjectArray(r.details))">
-                            <div *ngIf="r?.testShortName === 'BUILD_STATUS_TEST'">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <td class="text-center">Expected</td>
-                                            <td class="text-center">Actual</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="pb-0 text-left w-50">{{r?.details?.expected.replaceAll('_', ' ') | titlecase}}</td>
-                                            <td class="pb-0 text-left w-50">{{r?.details?.actual.replaceAll('_', ' ') | titlecase}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <div *ngIf="r?.testShortName !== 'BUILD_STATUS_TEST'">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <td class="text-center">Name</td>
-                                            <td class="text-center">Status</td>
-                                            <td class="text-center">Expected</td>
-                                            <td class="text-center">Actual</td>
-                                            <td class="text-center" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"></td>
-                                            <td class="text-center" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"></td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr *ngFor="let d of r?.details">
-                                            <td class="pb-0 text-left" style="width: 10%;">{{d?.name.replaceAll('_', ' ') | titlecase}}</td>
-                                            <td class="pb-0 text-left fw-bold text-danger" style="width: 10%;">
-                                                {{d?.status.replaceAll('_', ' ') | titlecase}}
-                                            </td>
-                                            <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.expected)}}</td>
-                                            <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td>
-                                            <td class="pb-0 text-left" style="min-width: 120px;max-width: 120px;" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected, true)">Show Diff excluding UUID</a></td>
-                                            <td class="pb-0 text-left" style="min-width: 120px;max-width: 120px;" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected, false)">Show Diff including UUID</a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </td>
-                        <td class="pb-0 text-left" *ngIf="r.testName ==='RVF Report Comparison' && r?.result !== 'NOT_RUN' && r.details !== null && !isObjectArray(r.details)">
+<app-modal id="report-details-modal" class="modal" size="full-width">
+    <h3 header class="mb-0">Test Report Details</h3>
+    <div body>
+        <div class="text-center" style="overflow: auto;">
+            <h1 class="pt-3"></h1>
+            <div class="container-fluid testing-container report-details">
+                <table class="table table-bordered text-center">
+                    <thead>
+                        <tr>
+                            <td>Build ID</td>
+                            <td class="w-10">URL</td>
+                            <td>Pre-condition Check Report URL</td>
+                            <td>Post-condition Check Report URL</td>
+                            <td>RVF URL</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">{{leftBuild?.id}}</td>
+                            <td><button type="button" *ngIf="leftBuild?.url" class="btn blue text-nowrap" (click)="openURL(leftBuild?.url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                            <td><button type="button" *ngIf="leftBuild?.preConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(leftBuild?.preConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                            <td><button type="button" *ngIf="leftBuild?.postConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(leftBuild?.postConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                            <td><button type="button" *ngIf="leftBuild?.rvfURL" class="btn blue text-nowrap" (click)="openURL(leftBuild?.rvfURL); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">{{rightBuild?.id}}</td>
+                            <td><button type="button" *ngIf="rightBuild?.url" class="btn blue text-nowrap" (click)="openURL(rightBuild?.url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                            <td><button type="button" *ngIf="rightBuild?.preConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(rightBuild?.preConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                            <td><button type="button" *ngIf="rightBuild?.postConditionCheckReports_url" class="btn blue text-nowrap" (click)="openURL(rightBuild?.postConditionCheckReports_url); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                            <td><button type="button" *ngIf="rightBuild?.rvfURL" class="btn blue text-nowrap" (click)="openURL(rightBuild?.rvfURL); $event.stopPropagation()" title="Build URL"><i class="fas fa-external-link-alt pe-2"></i>OPEN</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br>
+                <div>
+                    <ng-container *ngFor="let r of selectedReport['reports']">
+                        <h3><span class="fw-bold report-name">{{r?.testName}}</span> (<span [ngClass]="{'text-danger': r?.result === 'FAILED',
+                                                                'text-success': r?.result === 'PASS',
+                                                                'text-warning': r?.result === 'NOT_RUN'}">{{r?.result.replaceAll('_', ' ') | titlecase}}</span>)</h3>
+                        <div *ngIf="r?.testShortName === 'BUILD_STATUS_TEST'">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <td class="text-center">Expected ({{leftBuild?.id}})</td>
+                                        <td class="text-center">Actual ({{rightBuild?.id}})</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="pb-0 text-left w-50">{{r?.details?.expected.replaceAll('_', ' ') | titlecase}}</td>
+                                        <td class="pb-0 text-left w-50">{{r?.details?.actual.replaceAll('_', ' ') | titlecase}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div *ngIf="(r?.testShortName !== 'BUILD_STATUS_TEST' && r.testName !=='RVF Report Comparison') || (r.testName ==='RVF Report Comparison' && (r?.result === 'NOT_RUN' || r.details === null || isObjectArray(r.details)))">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <td class="text-center">Name</td>
+                                        <td class="text-center">Status</td>
+                                        <td class="text-center">Expected ({{leftBuild?.id}})</td>
+                                        <td class="text-center">Actual ({{rightBuild?.id}})</td>
+                                        <td class="text-center" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"></td>
+                                        <td class="text-center" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let d of r?.details">
+                                        <td class="pb-0 text-left" style="width: 10%;">{{d?.name.replaceAll('_', ' ') | titlecase}}</td>
+                                        <td class="pb-0 text-left fw-bold text-danger" style="width: 10%;">
+                                            {{d?.status.replaceAll('_', ' ') | titlecase}}
+                                        </td>
+                                        <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.expected)}}</td>
+                                        <td class="pb-0 text-left min-vw-30 w-30 max-vw-30">{{getDisplayText(d?.actual)}}</td>
+                                        <td class="pb-0 text-left" style="min-width: 120px;max-width: 120px;" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected, true)">Show Diff excluding UUID</a></td>
+                                        <td class="pb-0 text-left" style="min-width: 120px;max-width: 120px;" *ngIf="r?.testShortName === 'RELEASE_PACKAGE_TEST'"><a *ngIf="d?.status === 'CONTENT_MISMATCH'" href="javascript:void(0)" (click)="findDiff(d?.expected, false)">Show Diff including UUID</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="pb-0 text-left" *ngIf="r.testName ==='RVF Report Comparison' && r?.result !== 'NOT_RUN' && r.details !== null && !isObjectArray(r.details)">
                             <div>
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
                                             <td class="text-center">Name</td>
                                             <td class="text-center">Status</td>
-                                            <td class="text-center">Expected</td>
-                                            <td class="text-center">Actual</td>
+                                            <td class="text-center">Expected ({{leftBuild?.id}})</td>
+                                            <td class="text-center">Actual ({{rightBuild?.id}})</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -192,7 +178,7 @@
                             </div>
                             <br>
                             <div>
-                                <h2 class="text-success">New Assertions: {{getNewAssertions(r?.details).length}}</h2>
+                                <h3 class="text-success">New Assertions: {{getNewAssertions(r?.details).length}}</h3>
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -210,7 +196,7 @@
                             </div>
                             <br>
                             <div>
-                                <h2 class="text-danger">Removed Assertions: {{getRemovedAssertions(r?.details).length}}</h2>
+                                <h3 class="text-danger">Removed Assertions: {{getRemovedAssertions(r?.details).length}}</h3>
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -228,7 +214,7 @@
                             </div>
                             <br>
                             <div>
-                                <h2 class="text-warning">Changed Assertions: {{getChangedAssertions(r?.details).length}}</h2>
+                                <h3 class="text-warning">Changed Assertions: {{getChangedAssertions(r?.details).length}}</h3>
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
@@ -248,13 +234,17 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        </div>
+                        <br>
+                    </ng-container>
+                </div>
+            </div>
         </div>
     </div>
-</div>
+    <div footer>
+        <button type="button" class="btn" (click)="closeModal('report-details-modal')">CLOSE</button>
+    </div>
+</app-modal>
 
 <app-modal id="add-tests-modal" class="modal" size="x-large">
     <h3 header class="mb-0">Add Tests</h3>

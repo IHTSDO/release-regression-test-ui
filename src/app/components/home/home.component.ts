@@ -27,7 +27,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     @ViewChild('reportPaginator') reportPaginator: MatPaginator;
 
     interval: any;
-    viewDetails = false;
     testReportsLoading = false;
     BuildViewMode = BuildViewMode;
 
