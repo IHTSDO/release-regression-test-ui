@@ -193,7 +193,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         } else {
             this.buildService.getBuilds(centerKey, productKey, false, false, request.viewMode, includeHiddenBuilds ? null : true).subscribe(
                 response => {
-                    response.sort((a, b) => new Date(b['id']).getTime() - new Date(a['id']).getTime());
+                    response['content'].sort((a, b) => new Date(b['id']).getTime() - new Date(a['id']).getTime());
                     this.buildMap[centerKey + '-' + productKey + '-' + request.viewMode + '-' + includeHiddenBuilds] = response['content'];
                     this.buildLoadingMap[centerKey + '-' + productKey] = false;
                 }

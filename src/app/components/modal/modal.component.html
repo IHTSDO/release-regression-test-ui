@@ -2,7 +2,7 @@
     <div class="modal-content">
         <div class="modal-header" *ngIf="!hideHeader">
             <ng-content select="[header]"></ng-content>
-            <button type="button" class="close" (click)="close()">
+            <button type="button" *ngIf="!hideCloseButton" class="close" (click)="close()">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
