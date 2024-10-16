@@ -106,6 +106,10 @@ app-modal {
         background-color: rgba(0,0,0,0.6);
         z-index: 1000;
     }
+    button.close {
+        right: 10px;
+        position: absolute;
+    }
 }
 
 //body.app-modal-open {

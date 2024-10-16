@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ReleaseCenter } from '../../models/releaseCenter';
-import { CodeSystem } from '../../models/codeSystem';
 import { FileDiffReport } from 'src/app/models/fileDiffReport';
 
 @Injectable({

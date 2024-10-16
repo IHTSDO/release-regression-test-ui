@@ -12,6 +12,7 @@ export class ModalComponent implements OnInit, OnDestroy {
     @Input() size = 'medium';
     @Input() hideHeader: boolean;
     @Input() hideFooter: boolean;
+    @Input() hideCloseButton: boolean;
     @Input() disableBackgroundClickEvent: boolean;
     private element: any;
 
