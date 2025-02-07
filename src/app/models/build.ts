@@ -9,6 +9,8 @@ export class Build {
     status: string;
     tags: string[];
     rvfURL: string;
+    releaseCenterKey: string;
+    productKey: string;
     configuration: BuildConfiguration;
     qaTestConfig: QAConfiguration;
     product: Product;

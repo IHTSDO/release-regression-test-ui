@@ -28,9 +28,10 @@ import { EnvServiceProvider } from './providers/env.service.provider';
 import { AuthoringService } from './services/authoring/authoring.service';
 import { ToastrModule } from 'ngx-toastr';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { PermissionService } from './services/permission/permission.service';
 
-export function startupServiceFactory(): Function {
-    return () => {};
+export function startupServiceFactory(permissionService: PermissionService): Function {
+    return () => permissionService.getRoles();
 }
 
 @NgModule({
@@ -58,6 +59,7 @@ export function startupServiceFactory(): Function {
         ReleaseServerService,
         ProductService,
         ModalService,
+        PermissionService,
         EnvServiceProvider,
         {
             provide: HTTP_INTERCEPTORS,
@@ -72,6 +74,7 @@ export function startupServiceFactory(): Function {
         {
             provide: APP_INITIALIZER,
             useFactory: startupServiceFactory,
+            deps: [PermissionService],
             multi: true
           }
     ],

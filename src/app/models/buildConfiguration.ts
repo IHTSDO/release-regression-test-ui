@@ -1,7 +1,7 @@
 import { ExtensionConfig } from './extensionConfig';
 
 export class BuildConfiguration {
-    effectiveTime: Date;
+    effectiveTime: string;
     classifyOutputFiles: boolean;
     useClassifierPreConditionChecks: boolean;
     createLegacyIds: boolean;

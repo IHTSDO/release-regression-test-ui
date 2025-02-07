@@ -130,6 +130,23 @@ app-modal {
         }
     }
 
+    &#publish-danger-modal {
+        p.danger-text {
+            background-color: $sea-buckthorn;
+            color: $black;
+            font-size: 1.6rem;
+            margin: -10px -10px 10px -10px;
+
+            i {
+                font-size: 2rem;
+            }
+        }
+
+        p.information-text {
+            font-size: 1.4rem;
+        }
+    }
+
     &.success-modal {
         div.success i {
             color:$fruit-salad;

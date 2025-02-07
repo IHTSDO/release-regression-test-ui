@@ -3,14 +3,15 @@ import { ProductService } from '../../services/product/product.service';
 import { ReleaseCenter } from '../../models/releaseCenter';
 import { ModalService } from '../../services/modal/modal.service';
 import { Product } from '../../models/product';
-import { RegressionTestService } from 'src/app/services/regressionTest/regression-test.service';
-import { TestRequest } from 'src/app/models/testRequest';
-import { ReleaseServerService } from 'src/app/services/releaseServer/release-server.service';
-import { BuildService } from 'src/app/services/build/build.service';
-import { DiffRow } from 'src/app/models/diffRow';
-import { FileDiffReport } from 'src/app/models/fileDiffReport';
-import { Build } from 'src/app/models/build';
+import { RegressionTestService } from '../../services/regressionTest/regression-test.service';
+import { TestRequest } from '../../models/testRequest';
+import { ReleaseServerService } from '../../services/releaseServer/release-server.service';
+import { BuildService } from '../../services/build/build.service';
+import { DiffRow } from '../../models/diffRow';
+import { FileDiffReport } from '../../models/fileDiffReport';
+import { Build } from '../../models/build';
 import { MatPaginator } from '@angular/material/paginator';
+import { PermissionService } from '../../services/permission/permission.service';
 
 enum BuildViewMode {
     PUBLISHED = 'Published',
@@ -29,6 +30,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     interval: any;
     testReportsLoading = false;
     BuildViewMode = BuildViewMode;
+    environment: string;
+    dangerInput: string;
 
     allTestReports: any[]; // hold all test reports
     filteredTestReports: any[]; // hold filtered test reports
@@ -36,6 +39,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     releaseCenters: ReleaseCenter[];
     products: Product[];
     buildMap: Object;
+    clonedBuildMap: Object;
     buildLoadingMap: Object;
     selectedReport: Object;
     selectedFileName: string;
@@ -44,6 +48,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     selectedCompareId: string;
     leftBuild: Build;
     rightBuild: Build;
+    selectedBuildToPublish: Build;
+    publishingBuilds: string[];
+    roles: any;
 
     // Diff file report
     diffReport: FileDiffReport;
@@ -63,10 +70,12 @@ export class HomeComponent implements OnInit, OnDestroy {
                 private releaseServerService: ReleaseServerService,
                 private productService: ProductService,
                 private buildService: BuildService,
+                private permissionService: PermissionService,
                 private regressionTestService: RegressionTestService) {
     }
 
     ngOnInit(): void {
+        this.roles = this.permissionService.roles;
         this.allTestReports = [];
         this.filteredTestReports = [];
         this.testRequests = [];
@@ -78,12 +87,15 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.buildMap = {};
         this.buildLoadingMap = {};
         this.selectedReport = {};
+        this.selectedBuildToPublish = new Build();
         this.diffReport = new FileDiffReport();
         this.leftBuild = new Build();
         this.rightBuild = new Build();
         this.loadTestReports();
         this.loadAllReleaseCenters();
         this.startPolling();
+        this.publishingBuilds = [];
+        this.clonedBuildMap = {};
     }
 
     ngOnDestroy(): void {
@@ -115,12 +127,34 @@ export class HomeComponent implements OnInit, OnDestroy {
                 this.totalReport = this.allTestReports.length;
                 this.allTestReports.sort((a, b) => b['startDate'] - a['startDate']);
                 this.filterTestReports();
+                if (this.allTestReports.length === 0) {
+                    this.testReportsLoading = false;
+                }
+                let count = 0;
+                for (let i = 0; i < this.allTestReports.length; i++) {
+                    const centerKey = this.allTestReports[i]['centerKey'];
+                    const productKey = this.allTestReports[i]['productKey'];
+                    const rightBuildId = this.allTestReports[i]['rightBuildId'];
+                    this.buildService.getBuild(centerKey, productKey, rightBuildId, true, false).subscribe(
+                        reponse => {
+                            this.clonedBuildMap[reponse.id] = reponse;
+                            count++;
+                            if (count === this.allTestReports.length) {
+                                this.testReportsLoading = false;
+                            }
+                        },() => {
+                            this.testReportsLoading = false;
+                            count++;
+                            if (count === this.allTestReports.length) {
+                                this.testReportsLoading = false;
+                            }
+                        }
+                    );
+                }
             },
             errorResponse => {
                 this.message = errorResponse.error.errorMessage;
                 this.openErrorModel();
-            },
-            () => {
                 this.testReportsLoading = false;
             }
         );
@@ -478,6 +512,97 @@ export class HomeComponent implements OnInit, OnDestroy {
                 }
             });
         }, 120000);
+    }
+
+    openPublishingBuildConfirmationModal(report: Object) {
+        this.selectedBuildToPublish = this.clonedBuildMap[report['rightBuildId']];
+        this.openModal('publish-danger-modal');
+
+    }
+
+    canPublishBuild(report: Object) {
+        const centerKey = report['centerKey'];
+        const rightBuildId = report['rightBuildId'];
+        const releaseCenter = this.releaseCenters.find(item => item.id === centerKey);
+        const build = this.clonedBuildMap[rightBuildId];
+        return (build && (build.status === 'BUILT' || build.status === 'RELEASE_COMPLETE' || build.status === 'RELEASE_COMPLETE_WITH_WARNINGS'))
+                && this.roles && releaseCenter && releaseCenter.codeSystem
+                && ((this.roles.hasOwnProperty('GLOBAL') && (
+                        (<Array<String>> this.roles['GLOBAL']).indexOf('RELEASE_ADMIN') !== -1
+                        || (<Array<String>> this.roles['GLOBAL']).indexOf('RELEASE_MANAGER') !== -1
+                        )
+                    )
+                    ||
+                    (this.roles.hasOwnProperty(releaseCenter.codeSystem) && (
+                            (<Array<String>> this.roles[releaseCenter.codeSystem]).indexOf('RELEASE_ADMIN') !== -1
+                        ||  (<Array<String>> this.roles[releaseCenter.codeSystem]).indexOf('RELEASE_MANAGER') !== -1
+                        )
+                    ));
+    }
+
+    isBuildPublishing(buildId: string) {
+        return this.publishingBuilds.indexOf(buildId) !== -1;
+    }
+
+    isBuildPublished(buildId: string) {
+        return this.clonedBuildMap[buildId] && this.clonedBuildMap[buildId].tags && this.clonedBuildMap[buildId].tags.indexOf('PUBLISHED') !== -1;
+    }
+
+    publishBuild(build: Build) {
+        this.closeModal('publish-danger-modal');
+        this.openWaitingModel('Publishing Build');
+        this.publishingBuilds.push(build.id);
+        this.buildService.publishBuild(build.releaseCenterKey, build.productKey, build.id).subscribe(
+            () => {
+                const interval = setInterval(() => {
+                    this.buildService.getPublishingBuildStatus(build.releaseCenterKey, build.productKey, build.id).subscribe(
+                        status => {
+                            if (status) {
+                                if (status['status'] === 'COMPLETED') {
+                                    this.buildService.getBuild(build.releaseCenterKey, build.productKey, build.id, false, false).subscribe(response => {
+                                        build.tags = response.tags;
+                                        this.publishingBuilds = this.publishingBuilds.filter(item => item !== build.id);
+                                        this.closeWaitingModel();
+                                        if (status['message']) {
+                                            this.message = status['message'];
+                                            this.message += '.\nPlease contact technical support to get help resolving this.';
+                                            this.openErrorModel();
+                                        } else {
+                                            this.message = 'The build has been published successfully.';
+                                            this.openSuccessModel();
+                                        }
+                                    });
+                                    clearInterval(interval);
+                                } else if (status['status'] === 'FAILED') {
+                                    this.publishingBuilds = this.publishingBuilds.filter(item => item !== build.id);
+                                    this.message = status['message'];
+                                    this.closeWaitingModel();
+                                    this.openErrorModel();
+                                    clearInterval(interval);
+                                } else {
+                                    // do nothing
+                                }
+                            }
+                        },
+                        errorResponse => {
+                            if (errorResponse.status === 404) {
+                                this.publishingBuilds = this.publishingBuilds.filter(item => item !== build.id);
+                                this.buildService.getBuild(build.releaseCenterKey, build.productKey, build.id, false, false).subscribe(response => {
+                                    build.tags = response.tags;
+                                    this.closeWaitingModel();
+                                });
+                            } else {
+                                this.publishingBuilds = this.publishingBuilds.filter(item => item !== build.id);
+                                this.message = errorResponse.error.errorMessage;
+                                this.closeWaitingModel();
+                                this.openErrorModel();
+                            }
+                            clearInterval(interval);
+                        }
+                    );
+                }, 10000);
+            }
+        );
     }
 
     openModal(name) {

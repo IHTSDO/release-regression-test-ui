@@ -7,7 +7,6 @@
             <thead>
                 <tr>
                     <td><h3 class="mb-0 text-start">ID</h3></td>
-                    <td><h3 class="mb-0 text-start">Date</h3></td>
                     <td><h3 class="mb-0 text-start">User</h3></td>
                     <td><h3 class="mb-0 text-start">Release Center</h3></td>
                     <td><h3 class="mb-0 text-start">Product</h3></td>
@@ -28,7 +27,6 @@
             <thead>
             <tr>
                 <td><h3 class="mb-0 text-start">ID</h3></td>
-                <td><h3 class="mb-0 text-start">Date</h3></td>
                 <td><h3 class="mb-0 text-start">User</h3></td>
                 <td><h3 class="mb-0 text-start">Release Center</h3></td>
                 <td><h3 class="mb-0 text-start">Product</h3></td>
@@ -45,7 +43,6 @@
             </tr>
             <tr *ngFor="let report of filteredTestReports">
                 <td class="p-3 text-start">{{report?.compareId}}</td>
-                <td class="p-3 text-start">{{report?.startDate | date:'yyyy-MM-ddTHH:mm:ss' : 'UTC'}}</td>
                 <td class="p-3 text-start">{{report?.username}}</td>
                 <td class="p-3 text-start">{{getCenterName(report?.centerKey)}}</td>
                 <td class="p-3 text-start">{{getProductName(report?.centerKey,report?.productKey)}}</td>
@@ -55,7 +52,13 @@
                     <b>{{report?.status.replaceAll('_', ' ') | titlecase}}</b>
                 </td>
                 <td class="p-3"><button *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED'" class="blue p-2 px-3 text-nowrap" (click)="setSelectedReport(report); openModal('report-details-modal')"><i class="fa-solid fa-list pe-2"></i>DETAILS</button></td>
-                <td class="p-3"><button *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED' || isReportRunningOutOfTime(report)" (click)="selectedReleaseCenter = report['centerKey'];selectedProduct = report['productKey'];selectedCompareId = report['compareId']; openModal('delete-confirmation-modal')" class="red p-2 px-3 text-nowrap"><i class="fas fa-times pe-2"></i>DELETE</button>
+                <td class="p-3" class="text-start" [ngStyle]="isBuildPublishing(report?.rightBuildId) ? {'min-width.px': '221'} : (isBuildPublished(report?.rightBuildId) ? {'min-width.px': '213'} : (canPublishBuild(report) ? {'min-width.px': '196'} : {'min-width.px': '0'}))">
+                    <button style="margin-left: 5px;" *ngIf="report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE' || report?.status === 'PASSED' || isReportRunningOutOfTime(report)" (click)="selectedReleaseCenter = report['centerKey'];selectedProduct = report['productKey'];selectedCompareId = report['compareId']; openModal('delete-confirmation-modal')" class="red p-2 px-3 text-nowrap"><i class="fas fa-times pe-2"></i>DELETE</button>
+                    <button type="button" class="btn green" style="margin-left: 5px;"
+                        *ngIf="canPublishBuild(report)"
+                        [disabled]="isBuildPublished(report?.rightBuildId)"
+                        (click)="openPublishingBuildConfirmationModal(report)"><i class="fas fa-paper-plane pe-2"></i>{{isBuildPublishing(report?.rightBuildId) ? 'PUBLISHING' : (isBuildPublished(report?.rightBuildId) ? 'PUBLISHED' : 'PUBLISH')}}</button>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -69,6 +72,26 @@
         </mat-paginator>
     </div>
 </div>
+<app-modal id="publish-danger-modal" class="modal">
+    <h3 header class="mb-0">Are you absolutely sure?</h3>
+    <div body class="text-center">
+        <p class="px-2 py-4 danger-text"><i class="fas fa-exclamation-triangle pe-3"></i>Unexpectedly bad things will happen if you don't read this!</p>
+        <p class="px-2 py-1 information-text text-start">- This action <B>cannot</B> be undone.</p>
+        <p class="px-2 py-1 information-text text-start">- The following changes are permanent.</p>
+        <p class="px-2 py-1 information-text text-start">- You are about to publish a SNOMED-CT release package.</p>
+        <p class="px-2 py-1 information-text text-start">- Please enter the release package effective time to confirm you understand this:</p>
+
+        <div class="input-group input-group-lg px-2 mb-3">
+            <span class="input-group-text">Release Package Effective Time</span>
+            <input type="text" class="form-control" placeholder="" [(ngModel)]="dangerInput">
+        </div>
+    </div>
+    <div footer>
+        <button type="button" class="btn" (click)="closeModal('publish-danger-modal')">CANCEL</button>
+        <button  type="button" *ngIf="dangerInput === selectedBuildToPublish?.configuration?.effectiveTime" [disabled]="false" (click)="publishBuild(selectedBuildToPublish)" class="btn reject ms-3">I understand, publish the release</button>
+        <button  type="button" *ngIf="dangerInput !== selectedBuildToPublish?.configuration?.effectiveTime" [disabled]="true" (click)="closeModal('publish-danger-modal')" class="btn ms-3">I understand, publish the release</button>
+    </div>
+</app-modal>
 
 <app-modal id="report-details-modal" class="modal" size="full-width" [hideCloseButton]="true">
     <h3 header class="mb-0">Test Report Details</h3>
