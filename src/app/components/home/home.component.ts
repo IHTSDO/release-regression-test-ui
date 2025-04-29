@@ -3,14 +3,15 @@ import { ProductService } from '../../services/product/product.service';
 import { ReleaseCenter } from '../../models/releaseCenter';
 import { ModalService } from '../../services/modal/modal.service';
 import { Product } from '../../models/product';
-import { RegressionTestService } from 'src/app/services/regressionTest/regression-test.service';
-import { TestRequest } from 'src/app/models/testRequest';
-import { ReleaseServerService } from 'src/app/services/releaseServer/release-server.service';
-import { BuildService } from 'src/app/services/build/build.service';
-import { DiffRow } from 'src/app/models/diffRow';
-import { FileDiffReport } from 'src/app/models/fileDiffReport';
-import { Build } from 'src/app/models/build';
+import { RegressionTestService } from '../../services/regressionTest/regression-test.service';
+import { TestRequest } from '../../models/testRequest';
+import { ReleaseServerService } from '../../services/releaseServer/release-server.service';
+import { BuildService } from '../../services/build/build.service';
+import { DiffRow } from '../../models/diffRow';
+import { FileDiffReport } from '../../models/fileDiffReport';
+import { Build } from '../../models/build';
 import { MatPaginator } from '@angular/material/paginator';
+import { PermissionService } from '../../services/permission/permission.service';
 
 enum BuildViewMode {
     PUBLISHED = 'Published',
@@ -44,6 +45,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     selectedCompareId: string;
     leftBuild: Build;
     rightBuild: Build;
+    roles: any;
 
     // Diff file report
     diffReport: FileDiffReport;
@@ -63,10 +65,12 @@ export class HomeComponent implements OnInit, OnDestroy {
                 private releaseServerService: ReleaseServerService,
                 private productService: ProductService,
                 private buildService: BuildService,
+                private permissionService: PermissionService,
                 private regressionTestService: RegressionTestService) {
     }
 
     ngOnInit(): void {
+        this.roles = this.permissionService.roles;
         this.allTestReports = [];
         this.filteredTestReports = [];
         this.testRequests = [];
@@ -115,12 +119,11 @@ export class HomeComponent implements OnInit, OnDestroy {
                 this.totalReport = this.allTestReports.length;
                 this.allTestReports.sort((a, b) => b['startDate'] - a['startDate']);
                 this.filterTestReports();
+                this.testReportsLoading = false;
             },
             errorResponse => {
                 this.message = errorResponse.error.errorMessage;
                 this.openErrorModel();
-            },
-            () => {
                 this.testReportsLoading = false;
             }
         );
@@ -170,6 +173,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     getProductsByCenter(centerKey) {
         return !centerKey ? [] : this.products.filter(item => item.releaseCenter.id === centerKey);
+    }
+
+    markBuildAsReadyToPublish(request: TestRequest) {
+        request.readyToPublish = !request.readyToPublish;
     }
 
     getBuilds(request: TestRequest) {
@@ -282,7 +289,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                         const productKey = response.productKey;
                         const rightBuildKey = response.id;
                         buildService.updateBuildVisibility(centerKey, productKey, rightBuildKey, false).subscribe(() => {});
-                        regressionTestService.compareBuilds(centerKey, productKey, testRequest['buildId'], rightBuildKey).subscribe(
+                        regressionTestService.compareBuilds(centerKey, productKey, testRequest['buildId'], rightBuildKey, testRequest['readyToPublish']).subscribe(
                             () => {
                                 index++;
                                 if (index === validTestRequests.length) {
@@ -478,6 +485,13 @@ export class HomeComponent implements OnInit, OnDestroy {
                 }
             });
         }, 120000);
+    }
+
+    canPublishBuild() {
+        return this.roles.hasOwnProperty('GLOBAL') && (
+                (<Array<String>> this.roles['GLOBAL']).indexOf('RELEASE_ADMIN') !== -1
+                || (<Array<String>> this.roles['GLOBAL']).indexOf('RELEASE_MANAGER') !== -1
+                );
     }
 
     openModal(name) {

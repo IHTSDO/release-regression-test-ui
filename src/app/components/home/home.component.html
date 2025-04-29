@@ -7,12 +7,12 @@
             <thead>
                 <tr>
                     <td><h3 class="mb-0 text-start">ID</h3></td>
-                    <td><h3 class="mb-0 text-start">Date</h3></td>
                     <td><h3 class="mb-0 text-start">User</h3></td>
                     <td><h3 class="mb-0 text-start">Release Center</h3></td>
                     <td><h3 class="mb-0 text-start">Product</h3></td>
                     <td><h3 class="mb-0">Original Build ID</h3></td>
                     <td><h3 class="mb-0">New Build ID</h3></td>
+                    <td><h3 class="mb-0" *ngIf="canPublishBuild()">Publish Status</h3></td>
                     <td><h3 class="mb-0">Status</h3></td>
                     <td><h3 class="mb-0">Details</h3></td>
                     <td></td>
@@ -20,7 +20,8 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="10"><div class="fw-bold loading">Loading</div></td>
+                    <td colspan="10" *ngIf="canPublishBuild()"><div class="fw-bold loading">Loading</div></td>
+                    <td colspan="9" *ngIf="!canPublishBuild()"><div class="fw-bold loading">Loading</div></td>
                 </tr>
             </tbody>
         </table>
@@ -28,12 +29,12 @@
             <thead>
             <tr>
                 <td><h3 class="mb-0 text-start">ID</h3></td>
-                <td><h3 class="mb-0 text-start">Date</h3></td>
                 <td><h3 class="mb-0 text-start">User</h3></td>
                 <td><h3 class="mb-0 text-start">Release Center</h3></td>
                 <td><h3 class="mb-0 text-start">Product</h3></td>
                 <td><h3 class="mb-0" style="min-width: 120px;">Original Build ID</h3></td>
                 <td><h3 class="mb-0">New Build ID</h3></td>
+                <td><h3 class="mb-0" *ngIf="canPublishBuild()">Publish Status</h3></td>
                 <td><h3 class="mb-0 th-sm">Status</h3></td>
                 <td><h3 class="mb-0 th-sm">Details</h3></td>
                 <td></td>
@@ -41,16 +42,20 @@
             </thead>
             <tbody>
             <tr *ngIf="allTestReports?.length === 0">
-                <td colspan="10">No reports found.</td>
+                <td colspan="10" *ngIf="canPublishBuild()">No reports found.</td>
+                <td colspan="9" *ngIf="!canPublishBuild()">No reports found.</td>
             </tr>
             <tr *ngFor="let report of filteredTestReports">
                 <td class="p-3 text-start">{{report?.compareId}}</td>
-                <td class="p-3 text-start">{{report?.startDate | date:'yyyy-MM-ddTHH:mm:ss' : 'UTC'}}</td>
                 <td class="p-3 text-start">{{report?.username}}</td>
                 <td class="p-3 text-start">{{getCenterName(report?.centerKey)}}</td>
                 <td class="p-3 text-start">{{getProductName(report?.centerKey,report?.productKey)}}</td>
                 <td class="p-3">{{report?.leftBuildId}}</td>
                 <td class="p-3">{{report?.rightBuildId}}</td>
+                <td class="p-3 fw-bold" *ngIf="canPublishBuild()" [ngClass]="{'text-danger': report?.publishStatus === 'FAILED', 'text-success': report?.publishStatus === 'COMPLETED'}">
+                    <b *ngIf="report?.publishStatus === 'COMPLETED'">{{report && report.publishStatus ? (report.publishStatus | titlecase) : ''}}</b>
+                    <b *ngIf="report?.publishStatus === 'FAILED'">{{report && report.publishStatus ? (report.publishStatus | titlecase) : ''}} <span><i class="fas fa-info-circle pe-2" matTooltip="{{report.publishMessage}}"></i></span></b>
+                </td>
                 <td class="p-3 fw-bold" [ngClass]="{'text-danger': report?.status === 'FAILED' || report?.status === 'FAILED_TO_COMPARE', 'text-success': report?.status === 'PASSED', 'text-primary': report?.status !== 'PASSED' && report?.status !== 'FAILED' && report?.status !== 'FAILED_TO_COMPARE'}">
                     <b>{{report?.status.replaceAll('_', ' ') | titlecase}}</b>
                 </td>
@@ -246,7 +251,7 @@
     </div>
 </app-modal>
 
-<app-modal id="add-tests-modal" class="modal" size="x-large">
+<app-modal id="add-tests-modal" class="modal" size="xx-large">
     <h3 header class="mb-0">Add Tests</h3>
     <div body class="text-left p-3">
         <div>
@@ -265,6 +270,9 @@
                 </div>
                 <div class="col">
                     <h3 class="m-2 ps-3">Hidden Builds</h3>
+                </div>
+                <div class="col" *ngIf="canPublishBuild()">
+                    <h3 class="m-2 ps-3">Publish Build</h3>
                 </div>
             </div>
             <ng-container *ngFor="let testRequest of testRequests; let i = index">
@@ -294,9 +302,16 @@
                     </div>
                     <div class="col">
                         <div class="form-check form-switch mx-3 my-1">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" [(ngModel)]="testRequest.includeHiddenBuilds" (click)="testRequest.buildId=''; testRequest.includeHiddenBuilds=!testRequest.includeHiddenBuilds; getBuilds(testRequest);">
-                            <label *ngIf="testRequest.includeHiddenBuilds" class="form-check-label my-1" for="flexSwitchCheckDefault">Included</label>
-                            <label *ngIf="!testRequest.includeHiddenBuilds" class="form-check-label my-1" for="flexSwitchCheckDefault">Excluded</label>
+                            <input class="form-check-input" type="checkbox" role="switch" id="hiddenBuildFlexSwitchCheckDefault" [(ngModel)]="testRequest.includeHiddenBuilds" (click)="testRequest.buildId=''; testRequest.includeHiddenBuilds=!testRequest.includeHiddenBuilds; getBuilds(testRequest);">
+                            <label *ngIf="testRequest.includeHiddenBuilds" class="form-check-label my-1" for="hiddenBuildFlexSwitchCheckDefault">Included</label>
+                            <label *ngIf="!testRequest.includeHiddenBuilds" class="form-check-label my-1" for="hiddenBuildFlexSwitchCheckDefault">Excluded</label>
+                        </div>
+                    </div>
+                    <div class="col" *ngIf="canPublishBuild()">
+                        <div class="form-check form-switch mx-3 my-1">
+                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" [(ngModel)]="testRequest.readyToPublish" (click)="markBuildAsReadyToPublish(testRequest);">
+                            <label *ngIf="!testRequest.readyToPublish" class="form-check-label my-1" for="flexSwitchCheckDefault">False</label>
+                            <label *ngIf="testRequest.readyToPublish" class="form-check-label my-1" for="flexSwitchCheckDefault">True</label>
                         </div>
                     </div>
 

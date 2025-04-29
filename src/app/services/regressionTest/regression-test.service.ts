@@ -24,10 +24,11 @@ export class RegressionTestService {
         return this.http.delete('/release/centers/' + centerKey + '/products/' + productKey + '/builds/compare/' + comparedId);
     }
 
-    compareBuilds(centerKey, productKey, leftBuildId, rightBuildId) {
+    compareBuilds(centerKey, productKey, leftBuildId, rightBuildId, readyToPublish = false): Observable<Object> {
           const params = new HttpParams()
           .set('leftBuildId', leftBuildId)
-          .set('rightBuildId', rightBuildId);
+          .set('rightBuildId', rightBuildId)
+          .set('readyToPublish', readyToPublish);
         return this.http.post<Object>('/release/centers/' + centerKey + '/products/' + productKey + '/builds/compare',
                                         {}, {params: params});
     }

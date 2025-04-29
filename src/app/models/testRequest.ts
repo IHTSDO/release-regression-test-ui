@@ -4,4 +4,5 @@ export class TestRequest {
     buildId: string;
     viewMode: string;
     includeHiddenBuilds: boolean;
+    readyToPublish: boolean;
 }
