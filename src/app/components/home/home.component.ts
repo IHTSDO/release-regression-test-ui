@@ -122,6 +122,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     loadTestReports() {
         this.testReportsLoading = true;
         this.totalReport = 0;
+        this.allTestReports = [];
+        this.filteredTestReports = [];
         this.regressionTestService.getTestReports().subscribe(
             response => {
                 this.allTestReports = response;

@@ -3,7 +3,7 @@
     <div class="container-fluid testing-container px-5">
         <button class="btn green float-end m-2" (click)="clearExistingTestRequests(); addNewTestRequest(); openModal('add-tests-modal')"><i class="fas fa-plus pe-2"></i>ADD TESTS</button>
         <button class="btn blue float-end m-2" (click)="refreshPaginatedTestReports(); loadTestReports()"><i class="fa-solid fa-arrow-rotate-right pe-2"></i>REFRESH</button>
-        <table class="table table-bordered" *ngIf="testReportsLoading">
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <td><h3 class="mb-0 text-start">ID</h3></td>
@@ -19,29 +19,11 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td colspan="10" *ngIf="canPublishBuild()"><div class="fw-bold loading">Loading</div></td>
-                    <td colspan="9" *ngIf="!canPublishBuild()"><div class="fw-bold loading">Loading</div></td>
-                </tr>
-            </tbody>
-        </table>
-        <table class="table table-bordered table-striped" *ngIf="!testReportsLoading">
-            <thead>
-            <tr>
-                <td><h3 class="mb-0 text-start">ID</h3></td>
-                <td><h3 class="mb-0 text-start">User</h3></td>
-                <td><h3 class="mb-0 text-start">Release Center</h3></td>
-                <td><h3 class="mb-0 text-start">Product</h3></td>
-                <td><h3 class="mb-0" style="min-width: 120px;">Original Build ID</h3></td>
-                <td><h3 class="mb-0">New Build ID</h3></td>
-                <td><h3 class="mb-0" *ngIf="canPublishBuild()">Publish Status</h3></td>
-                <td><h3 class="mb-0 th-sm">Status</h3></td>
-                <td><h3 class="mb-0 th-sm">Details</h3></td>
-                <td></td>
+            <tr *ngIf="testReportsLoading">
+                <td colspan="10" *ngIf="canPublishBuild()"><div class="fw-bold loading">Loading</div></td>
+                <td colspan="9" *ngIf="!canPublishBuild()"><div class="fw-bold loading">Loading</div></td>
             </tr>
-            </thead>
-            <tbody>
-            <tr *ngIf="allTestReports?.length === 0">
+            <tr *ngIf="!testReportsLoading && allTestReports?.length === 0">
                 <td colspan="10" *ngIf="canPublishBuild()">No reports found.</td>
                 <td colspan="9" *ngIf="!canPublishBuild()">No reports found.</td>
             </tr>
