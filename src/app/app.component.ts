@@ -3,9 +3,13 @@ import {Title} from '@angular/platform-browser';
 import {AuthoringService} from './services/authoring/authoring.service';
 import {EnvService} from './services/environment/env.service';
 import {DOCUMENT} from '@angular/common';
+import { SnomedNavbarComponent } from './components/snomed-navbar/snomed-navbar.component';
+import { SnomedFooterComponent } from './components/snomed-footer/snomed-footer.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
     selector: 'app-root',
+    imports: [RouterOutlet, SnomedNavbarComponent, SnomedFooterComponent],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss']
 })

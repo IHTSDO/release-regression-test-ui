@@ -1,32 +1,33 @@
-@import 'src/variables.scss';
+@use 'src/variables.scss' as *;
+@use "sass:color";
 
 div {
     button {
         color: $white;
 
         &.green {
-            background-color: lighten($fruit-salad, 10%);
+            background-color: color.adjust($fruit-salad, $lightness: 10%);
 
             i {
-                color: lighten($fruit-salad, 30%);
+                color: color.adjust($fruit-salad, $lightness: 30%);
             }
             &:hover {
                 background-color: $fruit-salad;
             }
         }
         &.blue {
-            background-color: lighten($cerulean, 10%);
+            background-color: color.adjust($cerulean, $lightness: 10%);
             i {
-                color: lighten($cerulean, 30%);
+                color: color.adjust($cerulean, $lightness: 30%);
             }
             &:hover {
                 background-color: $cerulean;
             }
         }
         &.red {
-            background-color: lighten($mandy, 10%);
+            background-color: color.adjust($mandy, $lightness: 10%);
             i {
-                color: lighten($mandy, 30%);
+                color: color.adjust($mandy, $lightness: 30%);
             }
             &:hover {
                 background-color: $mandy;
@@ -38,9 +39,9 @@ div {
 table {
     button {
         &.blue {
-            background-color: lighten($cerulean, 10%);
+            background-color: color.adjust($cerulean, $lightness: 10%);
             i {
-                color: lighten($cerulean, 30%);
+                color: color.adjust($cerulean, $lightness: 30%);
             }
             &:hover {
                 background-color: $cerulean;
@@ -69,14 +70,14 @@ table {
         tr {
             cursor: pointer;
             &:hover {
-                background-color: lighten($anakiwa, 5%);
+                background-color: color.adjust($anakiwa, $lightness: 5%);
             }
         }
         td {
             background-color: transparent !important;
         }
         tr.active {
-            background-color: lighten($anakiwa, 5%);
+            background-color: color.adjust($anakiwa, $lightness: 5%);
 
             &:hover {
                 background-color: $anakiwa;
@@ -111,9 +112,9 @@ app-modal {
     &#add-tests-modal {
         button {
             &.blue {
-                background-color: lighten($cerulean, 10%);
+                background-color: color.adjust($cerulean, $lightness: 10%);
                 i {
-                    color: lighten($cerulean, 30%);
+                    color: color.adjust($cerulean, $lightness: 30%);
                 }
                 &:hover {
                     background-color: $cerulean;

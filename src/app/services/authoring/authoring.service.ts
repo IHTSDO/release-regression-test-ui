@@ -12,7 +12,6 @@ export class AuthoringService {
     uiConfiguration: UIConfiguration;
 
     constructor(private http: HttpClient) {
-        this.environmentEndpoint = window.location.origin + '/';
     }
 
     getUIConfiguration(): Observable<UIConfiguration> {

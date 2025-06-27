@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
 import { ProductService } from '../../services/product/product.service';
 import { ReleaseCenter } from '../../models/releaseCenter';
 import { ModalService } from '../../services/modal/modal.service';
@@ -10,8 +10,12 @@ import { BuildService } from '../../services/build/build.service';
 import { DiffRow } from '../../models/diffRow';
 import { FileDiffReport } from '../../models/fileDiffReport';
 import { Build } from '../../models/build';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { PermissionService } from '../../services/permission/permission.service';
+import { ModalComponent } from '../modal/modal.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 enum BuildViewMode {
     PUBLISHED = 'Published',
@@ -20,6 +24,7 @@ enum BuildViewMode {
 
 @Component({
     selector: 'app-home',
+    imports: [ModalComponent, ReactiveFormsModule, CommonModule, FormsModule, MatPaginatorModule, MatTooltipModule],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss']
 })
@@ -66,10 +71,14 @@ export class HomeComponent implements OnInit, OnDestroy {
                 private productService: ProductService,
                 private buildService: BuildService,
                 private permissionService: PermissionService,
-                private regressionTestService: RegressionTestService) {
+                private regressionTestService: RegressionTestService,
+                @Inject(PLATFORM_ID) private platformId: Object) {
     }
 
     ngOnInit(): void {
+        if (!isPlatformBrowser(this.platformId)) {
+            return;
+        }
         this.roles = this.permissionService.roles;
         this.allTestReports = [];
         this.filteredTestReports = [];
