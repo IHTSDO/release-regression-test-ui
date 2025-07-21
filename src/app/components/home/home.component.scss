@@ -1,7 +1,11 @@
 @use 'src/variables.scss' as *;
 @use "sass:color";
 
-div {
+div#home-overview {
+    height: calc(100vh - 12rem);
+    overflow: auto;
+    display: block;
+
     button {
         color: $white;
 
@@ -11,24 +15,31 @@ div {
             i {
                 color: color.adjust($fruit-salad, $lightness: 30%);
             }
+
             &:hover {
                 background-color: $fruit-salad;
             }
         }
+
         &.blue {
             background-color: color.adjust($cerulean, $lightness: 10%);
+
             i {
                 color: color.adjust($cerulean, $lightness: 30%);
             }
+
             &:hover {
                 background-color: $cerulean;
             }
         }
+
         &.red {
             background-color: color.adjust($mandy, $lightness: 10%);
+
             i {
                 color: color.adjust($mandy, $lightness: 30%);
             }
+
             &:hover {
                 background-color: $mandy;
             }
@@ -40,42 +51,56 @@ table {
     button {
         &.blue {
             background-color: color.adjust($cerulean, $lightness: 10%);
+
             i {
                 color: color.adjust($cerulean, $lightness: 30%);
             }
+
             &:hover {
                 background-color: $cerulean;
             }
         }
     }
+
     td {
         padding: 1.1rem .8rem .8rem .8rem;
     }
+
     thead {
         tr:first-child {
             background-color: #E0E0E0;
         }
+
         td {
             font-weight: 400;
             background-color: transparent !important;
-            &.asc, &.desc, &.sortable {
+
+            &.asc,
+            &.desc,
+            &.sortable {
                 padding-right: 25px;
             }
-            &.asc::after, &.desc::after {
+
+            &.asc::after,
+            &.desc::after {
                 right: 10px;
             }
         }
     }
+
     tbody {
         tr {
             cursor: pointer;
+
             &:hover {
                 background-color: color.adjust($anakiwa, $lightness: 5%);
             }
         }
+
         td {
             background-color: transparent !important;
         }
+
         tr.active {
             background-color: color.adjust($anakiwa, $lightness: 5%);
 
@@ -85,6 +110,7 @@ table {
         }
     }
 }
+
 .report-details {
     table {
         thead {
@@ -92,37 +118,44 @@ table {
                 background-color: inherit !important;
             }
         }
+
         tbody {
             tr {
                 cursor: default;
+
                 &:hover {
                     background-color: inherit;
                 }
             }
+
             thead {
                 tr:hover {
                     background-color: #E0E0E0;
                 }
             }
-            
-        }       
-    }    
+
+        }
+    }
 }
+
 app-modal {
     &#add-tests-modal {
         button {
             &.blue {
                 background-color: color.adjust($cerulean, $lightness: 10%);
+
                 i {
                     color: color.adjust($cerulean, $lightness: 30%);
                 }
+
                 &:hover {
                     background-color: $cerulean;
                 }
             }
         }
 
-        select, label {
+        select,
+        label {
             font-size: 1.4rem;
         }
 
@@ -133,12 +166,13 @@ app-modal {
 
     &.success-modal {
         div.success i {
-            color:$fruit-salad;
+            color: $fruit-salad;
         }
     }
+
     &.error-modal {
         div.error i {
-            color:$mandy;
+            color: $mandy;
         }
     }
 }
