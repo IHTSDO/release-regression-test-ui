@@ -44,11 +44,7 @@
                             "./node_modules/@popperjs/core/dist/umd/popper.min.js",
                             "./node_modules/bootstrap/dist/js/bootstrap.min.js"
                         ],
-                        "server": "src/main.server.ts",
-                        "prerender": true,
-                        "ssr": {
-                            "entry": "server.ts"
-                        }
+                        "ssr": false
                     },
                     "configurations": {
                         "production": {
@@ -70,8 +66,7 @@
                             "optimization": false,
                             "extractLicenses": false,
                             "sourceMap": true,
-                            "ssr": false,
-                            "prerender": false
+                            "ssr": false
                         }
                     },
                     "defaultConfiguration": "production"
