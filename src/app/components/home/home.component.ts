@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild,  Inject, PLATFORM_ID } from '@angular/core';
 import { ProductService } from '../../services/product/product.service';
 import { ReleaseCenter } from '../../models/releaseCenter';
 import { ModalService } from '../../services/modal/modal.service';
