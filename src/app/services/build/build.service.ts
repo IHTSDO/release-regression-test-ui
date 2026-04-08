@@ -44,7 +44,7 @@ export class BuildService {
   }
 
   cloneBuild(releaseCenterKey, productKey, buildId):  Observable<Build> {
-    return this.http.post<Build>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds/' + buildId + '/clone', {});
+    return this.http.post<Build>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds/' + buildId + '/clone?targetStoragePathType=REGRESSION_STORAGE', {});
   }
 
   updateBuildVisibility(releaseCenterKey, productKey, buildId, visibility) {
