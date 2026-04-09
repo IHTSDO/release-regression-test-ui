@@ -291,7 +291,7 @@
                     </div>
                     <div class="col" *ngIf="canPublishBuild()">
                         <div class="form-check form-switch mx-3 my-1">
-                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" [(ngModel)]="testRequest.readyToPublish" (click)="markBuildAsReadyToPublish(testRequest);">
+                            <input class="form-check-input" type="checkbox" [disabled]="!isPublishedBuild(testRequest)" role="switch" id="flexSwitchCheckDefault" [(ngModel)]="testRequest.readyToPublish" (click)="markBuildAsReadyToPublish(testRequest);">
                             <label *ngIf="!testRequest.readyToPublish" class="form-check-label my-1" for="flexSwitchCheckDefault">False</label>
                             <label *ngIf="testRequest.readyToPublish" class="form-check-label my-1" for="flexSwitchCheckDefault">True</label>
                         </div>

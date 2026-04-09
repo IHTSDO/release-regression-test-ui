@@ -21,19 +21,22 @@ export class BuildService {
   getBuilds(releaseCenterKey, productKey, iclucdeBuildConfig, includeQAConfig, viewMode, visibility): Observable<Build[]> {
     let params;
     if (visibility) {
-          params = new HttpParams()
-            .set('includeBuildConfiguration', iclucdeBuildConfig)
-            .set('includeQAConfiguration', includeQAConfig)
-            .set('viewMode', viewMode)
-            .set('visibility', visibility);
-        } else {
-          params = new HttpParams()
-            .set('includeBuildConfiguration', iclucdeBuildConfig)
-            .set('viewMode', viewMode)
-            .set('includeQAConfiguration', includeQAConfig);
-        }
-
-      return this.http.get<Build[]>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds', {params: params});
+      params = new HttpParams()
+        .set('includeBuildConfiguration', iclucdeBuildConfig)
+        .set('includeQAConfiguration', includeQAConfig)
+        .set('viewMode', viewMode)
+        .set('visibility', visibility)
+        .set('pageNumber', 0)
+        .set('pageSize', 500);
+    } else {
+      params = new HttpParams()
+        .set('includeBuildConfiguration', iclucdeBuildConfig)
+        .set('viewMode', viewMode)
+        .set('includeQAConfiguration', includeQAConfig)
+        .set('pageNumber', 0)
+        .set('pageSize', 500);
+    }
+    return this.http.get<Build[]>('/release/centers/' + releaseCenterKey + '/products/' + productKey + '/builds', {params: params});
   }
 
   getPublishedBuilds(releaseCenterKey, productKey): Observable<Build[]> {

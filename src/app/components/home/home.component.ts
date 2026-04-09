@@ -505,6 +505,15 @@ export class HomeComponent implements OnInit, OnDestroy {
                 );
     }
 
+    isPublishedBuild(testRequest: TestRequest): boolean {
+        const buildList = this.buildMap[testRequest.centerKey + '-' + testRequest.productKey + '-' + testRequest.viewMode + '-' + testRequest.includeHiddenBuilds];
+        if (buildList) {
+            const build = buildList.find(item => item.id === testRequest.buildId);
+            return build && build.tags && build.tags.indexOf('PUBLISHED') !== -1;
+        }
+        return false;
+    }
+
     openModal(name) {
         this.modalService.open(name);
     }
